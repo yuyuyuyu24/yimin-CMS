@@ -1,0 +1,294 @@
+<template>
+  <div class="goods-content">
+    <div class="goods-content-header">
+      <h1>商品管理</h1>
+      <el-button
+        type="primary"
+        @click="singleCreation"
+      >增加商品</el-button>
+      <el-button
+        v-if="false"
+        type="primary"
+        @click="batchImport"
+      >批量增加商品</el-button>
+    </div>
+    <el-card shadow="hover">
+      <el-form
+        :inline="true"
+        size="small"
+        :model="searchFrom"
+        class=""
+      >
+        <el-form-item
+          label="关键词:"
+          prop=""
+        >
+          <el-input
+            v-model="searchFrom.keyWord"
+            placeholder="请输入关键词"
+          />
+        </el-form-item>
+        <el-form-item label="价钱:">
+          <el-input
+            v-model="searchFrom.price"
+            placeholder="请输入价钱"
+          />
+        </el-form-item>
+        <el-form-item label="商品分类:">
+          <el-select
+            v-model="searchFrom.type"
+            filterable
+            placeholder="请选择"
+          >
+            <el-option
+              label="全部"
+              value=""
+            />
+            <el-option
+              v-for="(v, k, i) in Config.MEAT_TYPE.MEAT_TYPE_STATUS()"
+              :key="i"
+              :label="v"
+              :value="k"
+            />
+          </el-select>
+        </el-form-item>
+        <el-form-item>
+          <el-button
+            class="form-btn__defalut"
+            type="success"
+            @click="searchUser(searchFrom)"
+          >查询</el-button>
+        </el-form-item>
+      </el-form>
+    </el-card>
+    <el-card style="margin-top:25px;">
+      <div slot="header">
+        <span>商品详情</span>
+      </div>
+      <el-table
+        :data="tableData"
+        stripe
+        style="width: 100%"
+      >
+        <el-table-column
+          type="index"
+          label="序号"
+          width="80"
+        />
+        <el-table-column
+          prop="goods_type"
+          label="商品分类"
+        >
+          <template slot-scope="scope">
+            {{ changeGoodsType(scope.row.goodsType) }}
+          </template>
+        </el-table-column>
+        <el-table-column
+          prop="goodsName"
+          label="商品名称"
+        />
+        <el-table-column
+          prop="goodsPrice"
+          label="商品价格"
+        />
+        <el-table-column
+          prop="goodsStock"
+          label="商品库存"
+        />
+        <el-table-column
+          prop="goods_status"
+          label="商品状态"
+        >
+          <template slot-scope="scope">
+            <span :class="{goods_status_normal: scope.row.goods_status === 1,goods_status_soldout: scope.row.goods_status === 2,goods_status_lowershelf: scope.row.goods_status === 3}">
+              {{ changeGoodsStatus(scope.row.goods_status) }}
+            </span>
+          </template>
+        </el-table-column>
+        <el-table-column
+          label="操作"
+          width="300"
+        >
+          <template slot-scope="scope">
+            <el-button
+              type="primary"
+              size="small"
+              @click="edit(scope)"
+            >编辑</el-button>
+            <el-button
+              v-if="
+                scope.row.goods_status === 1 || scope.row.goods_status === 2
+              "
+              type="danger"
+              size="small"
+              @click="lowerShelf(scope)"
+            >下架商品</el-button>
+            <el-button
+              v-if="scope.row.goods_status === 3"
+              type="warning"
+              size="small"
+              @click="upperShelf(scope)"
+            >上架商品</el-button>
+          </template>
+        </el-table-column>
+      </el-table>
+      <el-button
+        v-if="false"
+        class="form-btn__danger"
+        type="danger"
+        size="small"
+        @click="batchLowerShelf"
+      >批量下架商品</el-button>
+      <el-pagination
+        background
+        layout="prev, pager, next, jumper"
+        :current-page="currentPage"
+        style="margin-top:30px;"
+        @current-change="handleCurrentChange"
+      />
+    </el-card>
+  </div>
+</template>
+
+<script>
+export default {
+  data() {
+    return {
+      typeList: [],
+      currentPage: 1,
+      searchFrom: {},
+      tableData: [{
+        'goodsType': 'M',
+        'goodsName': '风干牛肉',
+        'goodsPrice': 140,
+        'goodsInfo': '真的好',
+        'goodsUnit': '个',
+        'coverList': [{ name: 'food.jpg', url: 'https://xxx.cdn.com/xxx.jpg' }],
+        'swiperList': [{ name: 'food.jpg', url: 'https://xxx.cdn.com/xxx.jpg' }],
+        'isVideos': false,
+        'isHot': false,
+        'goodsStock': 20,
+        'goods_status': 1
+      },
+      {
+        'goodsType': 'S',
+        'goodsName': '风干牛肉',
+        'goodsPrice': 140,
+        'goodsInfo': '真的好',
+        'goodsUnit': '个',
+        'coverList': [{ name: 'food.jpg', url: 'https://xxx.cdn.com/xxx.jpg' }],
+        'swiperList': [{ name: 'food.jpg', url: 'https://xxx.cdn.com/xxx.jpg' }],
+        'videoList': [{ name: 'food.jpg', url: 'https://xxx.cdn.com/xxx.jpg' }],
+        'isVideos': true,
+        'isHot': true,
+        'goodsStock': 0,
+        'goods_status': 2
+      },
+      {
+        'goodsType': 'O',
+        'goodsName': '风干牛肉',
+        'goodsPrice': 140,
+        'goodsInfo': '真的好',
+        'goodsUnit': '个',
+        'coverList': [{ name: 'food.jpg', url: 'https://xxx.cdn.com/xxx.jpg' }],
+        'swiperList': [{ name: 'food.jpg', url: 'https://xxx.cdn.com/xxx.jpg' }],
+        'videoList': [{ name: 'food.jpg', url: 'https://xxx.cdn.com/xxx.jpg' }],
+        'isHot': true,
+        'isVideos': true,
+        'goodsStock': 10,
+        'goods_status': 3
+      }],
+      appendToBody: true,
+      userFrom: {},
+      rules: {
+        number: [{ required: true, message: '请输入学号', trigger: 'blur' }],
+        name: [{ required: true, message: '请输入姓名', trigger: 'blur' }],
+        phone: [{ required: true, message: '请输入手机号', trigger: 'blur' }]
+      }
+    }
+  },
+  methods: {
+    // 增加商品
+    singleCreation() {
+      this.$router.push('/createGoods?type=add')
+    },
+    // 批量增加商品
+    batchImport() {
+      this.$router.push('/userImport')
+    },
+    // 查询
+    searchUser(searchFrom) {
+      console.log(searchFrom)
+    },
+    handleCurrentChange() { },
+    // 编辑用户
+    edit(scope) {
+      var arr = JSON.stringify(scope.row)
+      this.$router.push('/createGoods?type=edit&data=' + encodeURIComponent(arr))
+      // console.log(scope.row)
+    },
+
+    // 取消发布
+    handleClose() {
+      const _this = this
+      this.$confirm('是否取消?', '确认信息', {
+        distinguishCancelAndClose: true,
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
+      })
+        .then(() => {
+          _this.dialogVisible = false
+        })
+        .catch(action => {
+        })
+    },
+    // 确定发布
+    submit(form) {
+      const _this = this
+      this.$refs[form].validate(async(valid) => {
+        if (!valid) return false
+        _this.dialogVisible = false
+      })
+    },
+    // 下架商品
+    lowerShelf(scope) { },
+    // 批量下架商品
+    batchLowerShelf() { },
+    // 转换商品类型
+    changeGoodsType(val) {
+      return this.Config.MEAT_TYPE.MEAT_TYPE_STATUS(val)
+    },
+    // 转换商品状态
+    changeGoodsStatus(val) {
+      return this.Config.GOODS_STATUS.GOODS_STATUS_FUN(val)
+    }
+  }
+}
+</script>
+
+<style lang="scss" scoped>
+.goods-content {
+  padding: 40px;
+  .goods-content-header {
+    h1 {
+      font-size: 24px;
+      padding-right: 30px;
+    }
+    display: flex;
+    align-items: center;
+    margin-bottom: 50px;
+  }
+  .goods_status_normal {
+    color: #67c23a;
+  }
+  .goods_status_soldout {
+    color: #e6a23c;
+  }
+  .goods_status_lowershelf {
+    color: #909399;
+  }
+  .form-btn__danger {
+    margin-top: 20px;
+  }
+}
+</style>
