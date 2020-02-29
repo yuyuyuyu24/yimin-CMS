@@ -268,6 +268,7 @@ export default {
 
 <style lang="scss" scoped>
 .goods-content {
+  margin: 50px 0;
   padding: 40px;
   .goods-content-header {
     h1 {

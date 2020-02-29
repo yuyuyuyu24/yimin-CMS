@@ -201,6 +201,7 @@ export default {
 
 <style lang="scss" scoped>
 .swiper-content {
+  margin: 50px 0;
   padding: 40px;
   .swiper-content-header {
     h1 {

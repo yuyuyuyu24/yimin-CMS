@@ -362,6 +362,7 @@ export default {
 
 <style lang="scss" scoped>
 .notice-content {
+  margin: 50px 0;
   padding: 40px;
   .notice-content-header {
     h1 {

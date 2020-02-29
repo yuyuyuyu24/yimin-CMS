@@ -19,7 +19,8 @@ export default {
 <style lang="scss" scoped>
 .order {
   &-container {
-    margin: 30px;
+    margin: 50px 0;
+    padding: 30px;
   }
   &-text {
     font-size: 30px;

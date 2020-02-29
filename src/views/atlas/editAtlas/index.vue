@@ -245,6 +245,7 @@ export default {
 
 <style lang="scss" scoped>
 .editAtlas-content {
+margin:50px 0;
   padding: 40px;
   .editAtlas-content-header {
     h1 {

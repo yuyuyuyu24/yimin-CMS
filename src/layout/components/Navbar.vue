@@ -1,25 +1,26 @@
 <template>
   <div class="navbar">
-    <hamburger
-      :is-active="sidebar.opened"
-      class="hamburger-container"
-      @toggleClick="toggleSideBar"
-    />
+    <div class="navbar-content">
+      <hamburger
+        :is-active="sidebar.opened"
+        class="hamburger-container"
+        @toggleClick="toggleSideBar"
+      />
 
-    <breadcrumb class="breadcrumb-container" />
+      <breadcrumb class="breadcrumb-container" />
 
-    <span class="title">清真伊民肉业</span>
+      <span class="title">清真伊民肉业</span>
 
-    <div class="right-menu">
-      <span
-        class="show-pwd"
-        @click="logout"
-      >
-        <svg-icon icon-class="signOut" />
-        退出
-      </span>
+      <div class="right-menu">
+        <span
+          class="show-pwd"
+          @click="logout"
+        >
+          <svg-icon icon-class="signOut" />
+          退出
+        </span>
+      </div>
     </div>
-
   </div>
 </template>
 
@@ -53,85 +54,103 @@ export default {
 
 <style lang="scss" scoped>
 .navbar {
+  width: calc(100% - 210px);
+  position: fixed;
+  top: 0;
+  right: 0;
   height: 50px;
   overflow: hidden;
   background: #fff;
   box-shadow: 0 1px 4px rgba(0, 21, 41, 0.08);
   text-align: center;
   line-height: 50px;
-  .hamburger-container {
-    line-height: 46px;
+  z-index: 10;
+  .navbar-content {
+    width: 100%;
+    position: relative;
+    top: 0;
+    right: 0;
     height: 100%;
-    float: left;
-    cursor: pointer;
-    transition: background 0.3s;
-    -webkit-tap-highlight-color: transparent;
-    &:hover {
-      background: rgba(0, 0, 0, 0.025);
-    }
-  }
-  .title {
-    font-size: 20px;
-    font-weight: 600;
-    margin: 0;
-  }
-
-  .breadcrumb-container {
-    float: left;
-  }
-
-  .right-menu {
-    height: 100%;
-    line-height: 50px;
-
-    &:focus {
-      outline: none;
-    }
-    &:hover {
-      cursor: pointer;
-    }
-    span {
-      font-size: 16px;
-      padding-right: 10px;
-    }
-    .right-menu-item {
-      display: inline-block;
-      padding: 0 8px;
+    .hamburger-container {
+      position: absolute;
+      left: 0;
+      line-height: 46px;
       height: 100%;
-      font-size: 18px;
-      color: #5a5e66;
-      vertical-align: text-bottom;
-
-      &.hover-effect {
-        cursor: pointer;
-        transition: background 0.3s;
-
-        &:hover {
-          background: rgba(0, 0, 0, 0.025);
-        }
+      float: left;
+      cursor: pointer;
+      transition: background 0.3s;
+      -webkit-tap-highlight-color: transparent;
+      &:hover {
+        background: rgba(0, 0, 0, 0.025);
       }
     }
+    .title {
+      font-size: 20px;
+      font-weight: 600;
+      margin: 0;
+    }
 
-    .avatar-container {
-      margin-right: 30px;
+    .breadcrumb-container {
+      position: absolute;
+      left: 50px;
+    }
 
-      .avatar-wrapper {
-        margin-top: 5px;
-        position: relative;
+    .right-menu {
+      height: 100%;
+      line-height: 50px;
+      position: absolute;
+      right: 0;
+      top: 0;
 
-        .user-avatar {
+      &:focus {
+        outline: none;
+      }
+      &:hover {
+        cursor: pointer;
+      }
+      span {
+        font-size: 16px;
+        padding-right: 10px;
+      }
+      .right-menu-item {
+        display: inline-block;
+        padding: 0 8px;
+        height: 100%;
+        font-size: 18px;
+        color: #5a5e66;
+        vertical-align: text-bottom;
+
+        &.hover-effect {
           cursor: pointer;
-          width: 40px;
-          height: 40px;
-          border-radius: 10px;
+          transition: background 0.3s;
+
+          &:hover {
+            background: rgba(0, 0, 0, 0.025);
+          }
         }
+      }
 
-        .el-icon-caret-bottom {
-          cursor: pointer;
-          position: absolute;
-          right: -20px;
-          top: 25px;
-          font-size: 12px;
+      .avatar-container {
+        margin-right: 30px;
+
+        .avatar-wrapper {
+          margin-top: 5px;
+          position: relative;
+
+          .user-avatar {
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+          }
+
+          .el-icon-caret-bottom {
+            cursor: pointer;
+            position: absolute;
+            right: -20px;
+            top: 25px;
+            font-size: 12px;
+          }
         }
       }
     }

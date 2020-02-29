@@ -344,6 +344,7 @@ export default {
 
 <style lang="scss" >
 .create-content {
+  margin: 50px 0;
   padding: 40px;
   .create-content-header {
     h1 {

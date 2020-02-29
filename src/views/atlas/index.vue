@@ -65,7 +65,7 @@ export default {
   data() {
     return {
       atlasData: [
-        {          name: '店铺实拍',
+        { name: '店铺实拍',
           imgs:
             [
               'https://dss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=3134936990,1473651008&fm=26&gp=0.jpg',
@@ -75,7 +75,7 @@ export default {
             ],
           id: 0
         },
-        {          'name': '店铺实拍2',
+        { 'name': '店铺实拍2',
           'imgs':
             ['https://dss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=3134936990,1473651008&fm=26&gp=0.jpg',
               'https://dss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=3134936990,1473651008&fm=26&gp=0.jpg'],
@@ -104,6 +104,7 @@ export default {
 
 <style lang="scss" scoped>
 .atlas-content {
+  margin: 50px 0;
   padding: 40px;
   .atlas-content-header {
     h1 {

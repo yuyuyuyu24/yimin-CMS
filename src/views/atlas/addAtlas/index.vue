@@ -123,6 +123,7 @@ export default {
 
 <style lang="scss" scoped>
 .addAtlas-content {
+  margin: 50px 0;
   padding: 40px;
   .addAtlas-content-header {
     h1 {
