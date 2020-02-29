@@ -1,4 +1,34 @@
 export default {
+  // 公告状态
+  NOTICE_STATUS: {
+    NOTICE_STATUS_USEING: '1',
+    NOTICE_STATUS_STOP: '2',
+    NOTICE_STATUS_FUN: function(val) {
+      const arr = {}
+      arr[this.NOTICE_STATUS_USEING] = '使用中'
+      arr[this.NOTICE_STATUS_STOP] = '停用'
+      if (val && arr[val]) {
+        return arr[val]
+      } else {
+        return arr
+      }
+    }
+  },
+  // 公告类型
+  NOTICE_TYPE: {
+    NOTICE_TYPE_ALERT: '1',
+    NOTICE_TYPE_PAGE: '2',
+    NOTICE_TYPE_STATUS: function(val) {
+      const arr = {}
+      arr[this.NOTICE_TYPE_ALERT] = '弹窗公告'
+      arr[this.NOTICE_TYPE_PAGE] = '首页公告'
+      if (val && arr[val]) {
+        return arr[val]
+      } else {
+        return arr
+      }
+    }
+  },
   // 肉的类型
   MEAT_TYPE: {
     MEAT_TYPE_CATTLE: 'M',
