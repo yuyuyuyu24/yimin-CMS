@@ -1,5 +1,5 @@
 export default {
-  // api: 'http://localhost:3000/api',
+  api: 'http://localhost:3000/api',
   // 公告状态
   NOTICE_STATUS: {
     NOTICE_STATUS_USEING: '1',
@@ -65,5 +65,11 @@ export default {
         return arr
       }
     }
+  },
+  ENCODE(id) {
+    return id * 24
+  },
+  UNENCODE(id) {
+    return id / 24
   }
 }

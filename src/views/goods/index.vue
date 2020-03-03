@@ -20,23 +20,23 @@
         class=""
       >
         <el-form-item
-          label="关键词:"
+          label="商品名:"
           prop=""
         >
           <el-input
-            v-model="searchFrom.keyWord"
-            placeholder="请输入关键词"
+            v-model="searchFrom.goodsName"
+            placeholder="请输入商品名"
           />
         </el-form-item>
         <el-form-item label="价钱:">
           <el-input
-            v-model="searchFrom.price"
+            v-model="searchFrom.goodsPrice"
             placeholder="请输入价钱"
           />
         </el-form-item>
         <el-form-item label="商品分类:">
           <el-select
-            v-model="searchFrom.type"
+            v-model="searchFrom.goodsType"
             filterable
             placeholder="请选择"
           >
@@ -151,13 +151,18 @@
 </template>
 
 <script>
-import { getGoods } from '@/api/goods'
+import { getGoods, queryGoods, lowerGoods } from '@/api/goods'
+import { startLoading, closeLoading, message } from '@/utils/loading'
 export default {
   data() {
     return {
       typeList: [],
       currentPage: 1,
-      searchFrom: {},
+      searchFrom: {
+        goodsName: '',
+        goodsPrice: '',
+        goodsType: ''
+      },
       tableData: [],
       appendToBody: true,
       userFrom: {},
@@ -175,9 +180,14 @@ export default {
     // 获取全部商品接口
     getGoodsFun() {
       let _this = this
-      getGoods().then(res => {
-        console.log(res.data.data)
-        _this.tableData = res.data.data
+      startLoading()
+      getGoods('goods/getGoods').then(res => {
+        closeLoading()
+        if (res.status !== 200) {
+          message()
+        } else {
+          _this.tableData = res.data.data
+        }
       })
     },
     // 增加商品
@@ -190,16 +200,23 @@ export default {
     },
     // 查询
     searchUser(searchFrom) {
-      console.log(searchFrom)
+      let _this = this
+      // 根据条件查询商品
+      startLoading()
+      queryGoods('goods/queryGoods', searchFrom).then(res => {
+        closeLoading()
+        if (res.status !== 200) {
+          message()
+        } else {
+          _this.tableData = res.data.data
+        }
+      })
     },
     handleCurrentChange() { },
     // 编辑用户
     edit(scope) {
-      var arr = JSON.stringify(scope.row)
-      this.$router.push('/createGoods?type=edit&data=' + encodeURIComponent(arr))
-      // console.log(scope.row)
+      this.$router.push(`/createGoods?type=edit&id=${this.Config.ENCODE(scope.row.id)}`)
     },
-
     // 取消发布
     handleClose() {
       const _this = this
@@ -223,7 +240,70 @@ export default {
       })
     },
     // 下架商品
-    lowerShelf(scope) { },
+    lowerShelf(scope) {
+      this.$confirm(`是否确定下架 ${scope.row.goodsName} ?`, '注意！', {
+        distinguishCancelAndClose: true,
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
+      })
+        .then(() => {
+          let data = {
+            id: scope.row.id,
+            goodsStatus: 3
+          }
+          startLoading()
+          lowerGoods('goods/lowerGoods', data).then(res => {
+            closeLoading()
+            if (res.status !== 200) {
+              message()
+            } else {
+              this.$message({
+                message: '修改成功!',
+                type: 'success'
+              })
+              this.getGoodsFun()
+            }
+          })
+        })
+        .catch(action => {
+        })
+    },
+    // 上架商品
+    upperShelf(scope) {
+      this.$confirm(`是否确定上架 ${scope.row.goodsName} ?`, '注意！', {
+        distinguishCancelAndClose: true,
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
+      })
+        .then(() => {
+          let goods_tatus
+          if (scope.row.goodsStock <= 0) {
+            goods_tatus = 2
+          } else {
+            goods_tatus = 1
+          }
+          let data = {
+            id: scope.row.id,
+            goodsStatus: goods_tatus
+          }
+          startLoading()
+          lowerGoods('goods/lowerGoods', data).then(res => {
+            closeLoading()
+            if (res.status !== 200) {
+              message()
+            } else {
+              this.$message({
+                message: '修改成功!',
+                type: 'success'
+              })
+              this.getGoodsFun()
+            }
+          })
+        })
+        .catch(action => {
+          console.log(scope.row.goodsStock)
+        })
+    },
     // 批量下架商品
     batchLowerShelf() { },
     // 转换商品类型

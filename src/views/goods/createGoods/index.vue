@@ -139,6 +139,7 @@
         <el-input
           v-model.number="createFrom.goodsStock"
           type="number"
+          min="0"
           placeholder="请输入商品库存量"
         />
         <p>注：商品库存量可以不填，默认库存数量为99，当库存量为 0 时商品会显示已售罄。</p>
@@ -225,6 +226,8 @@
 </template>
 
 <script>
+import { getGoodsDetail } from '@/api/goods'
+import { startLoading, closeLoading, message } from '@/utils/loading'
 export default {
   data() {
     return {
@@ -268,14 +271,37 @@ export default {
   },
   mounted() {
     if (this.$route.query.type === 'edit') {
-      console.log(this.$route.query)
-      this.createFrom = JSON.parse(this.$route.query.data)
+      let id = this.Config.UNENCODE(this.$route.query.id)
+      this.getGoodsFun({ id })
     } if (this.$route.query.type === 'add') {
       console.log(this.createFrom)
       return this.createFrom
     }
   },
   methods: {
+    // 获取全部商品接口
+    getGoodsFun({ id }) {
+      let _this = this
+      startLoading()
+      getGoodsDetail('goods/getGoodsDetail', { id }).then(res => {
+        closeLoading()
+        if (res.status !== 200) {
+          message()
+        } else {
+          if (res.data.data.isHot === 0) {
+            res.data.data.isHot = false
+          } else {
+            res.data.data.isHot = true
+          }
+          if (res.data.data.isVideos === 0) {
+            res.data.data.isVideos = false
+          } else {
+            res.data.data.isVideos = true
+          }
+          _this.createFrom = res.data.data
+        }
+      })
+    },
     coverHandlePreview(file, fileList) {
       console.log(file, fileList)
     },
@@ -315,21 +341,28 @@ export default {
     },
     // 提交
     submit(createFrom) {
-      this.$refs[createFrom].validate((valid) => {
-        if (this.createFrom.coverList.length > 0) {
-          this.$refs.coverFrom.clearValidate()
-        }
-        if (this.createFrom.swiperList.length > 0) {
-          this.$refs.swiperFrom.clearValidate()
-        }
-        if (valid) {
-          this.centerDialogVisible = true
-        } else {
-          console.log('error submit!!')
-          return false
-        }
-      })
-      if (this.createFrom.goodsStock === 0 || this.createFrom.goodsStock === '') {
+      // this.$refs[createFrom].validate((valid) => {
+      //   if (this.createFrom.coverList.length > 0) {
+      //     this.$refs.coverFrom.clearValidate()
+      //   }
+      //   if (this.createFrom.swiperList.length > 0) {
+      //     this.$refs.swiperFrom.clearValidate()
+      //   }
+      //   if (valid) {
+      //     this.centerDialogVisible = true
+      //   } else {
+      //     console.log('error submit!!')
+      //     return false
+      //   }
+      // })
+      if (this.createFrom.goodsStock < 0) {
+        return this.$message({
+          message: '商品库存量不能为负数!',
+          type: 'warning'
+        })
+      }
+
+      if (this.createFrom.goodsStock === 0) {
         this.createFrom.goods_status = 2
       } else {
         this.createFrom.goods_status = 1
