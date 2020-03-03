@@ -153,6 +153,11 @@
       margin-left: 0px;
     }
 
+    .navbar {
+      width: 100% !important;
+    }
+
+
     .sidebar-container {
       transition: transform .28s;
       width: $sideBarWidth !important;

@@ -1,4 +1,5 @@
 export default {
+  // api: 'http://localhost:3000/api',
   // 公告状态
   NOTICE_STATUS: {
     NOTICE_STATUS_USEING: '1',
@@ -31,7 +32,7 @@ export default {
   },
   // 肉的类型
   MEAT_TYPE: {
-    MEAT_TYPE_CATTLE: 'M',
+    MEAT_TYPE_CATTLE: 'B',
     MEAT_TYPE_SHEEP: 'S',
     MEAT_TYPE_CHICKEN: 'C',
     MEAT_TYPE_OTHER: 'O',

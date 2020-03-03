@@ -76,7 +76,7 @@
           width="80"
         />
         <el-table-column
-          prop="goods_type"
+          prop=""
           label="商品分类"
         >
           <template slot-scope="scope">
@@ -96,12 +96,12 @@
           label="商品库存"
         />
         <el-table-column
-          prop="goods_status"
+          prop=""
           label="商品状态"
         >
           <template slot-scope="scope">
-            <span :class="{goods_status_normal: scope.row.goods_status === 1,goods_status_soldout: scope.row.goods_status === 2,goods_status_lowershelf: scope.row.goods_status === 3}">
-              {{ changeGoodsStatus(scope.row.goods_status) }}
+            <span :class="{goods_status_normal: scope.row.goodsStatus === 1,goods_status_soldout: scope.row.goodsStatus === 2,goods_status_lowershelf: scope.row.goodsStatus === 3}">
+              {{ changeGoodsStatus(scope.row.goodsStatus) }}
             </span>
           </template>
         </el-table-column>
@@ -117,14 +117,14 @@
             >编辑</el-button>
             <el-button
               v-if="
-                scope.row.goods_status === 1 || scope.row.goods_status === 2
+                scope.row.goodsStatus === 1 || scope.row.goodsStatus === 2
               "
               type="danger"
               size="small"
               @click="lowerShelf(scope)"
             >下架商品</el-button>
             <el-button
-              v-if="scope.row.goods_status === 3"
+              v-if="scope.row.goodsStatus === 3"
               type="warning"
               size="small"
               @click="upperShelf(scope)"
@@ -151,53 +151,14 @@
 </template>
 
 <script>
+import { getGoods } from '@/api/goods'
 export default {
   data() {
     return {
       typeList: [],
       currentPage: 1,
       searchFrom: {},
-      tableData: [{
-        'goodsType': 'M',
-        'goodsName': '风干牛肉',
-        'goodsPrice': 140,
-        'goodsInfo': '真的好',
-        'goodsUnit': '个',
-        'coverList': [{ name: 'food.jpg', url: 'https://xxx.cdn.com/xxx.jpg' }],
-        'swiperList': [{ name: 'food.jpg', url: 'https://xxx.cdn.com/xxx.jpg' }],
-        'isVideos': false,
-        'isHot': false,
-        'goodsStock': 20,
-        'goods_status': 1
-      },
-      {
-        'goodsType': 'S',
-        'goodsName': '风干牛肉',
-        'goodsPrice': 140,
-        'goodsInfo': '真的好',
-        'goodsUnit': '个',
-        'coverList': [{ name: 'food.jpg', url: 'https://xxx.cdn.com/xxx.jpg' }],
-        'swiperList': [{ name: 'food.jpg', url: 'https://xxx.cdn.com/xxx.jpg' }],
-        'videoList': [{ name: 'food.jpg', url: 'https://xxx.cdn.com/xxx.jpg' }],
-        'isVideos': true,
-        'isHot': true,
-        'goodsStock': 0,
-        'goods_status': 2
-      },
-      {
-        'goodsType': 'O',
-        'goodsName': '风干牛肉',
-        'goodsPrice': 140,
-        'goodsInfo': '真的好',
-        'goodsUnit': '个',
-        'coverList': [{ name: 'food.jpg', url: 'https://xxx.cdn.com/xxx.jpg' }],
-        'swiperList': [{ name: 'food.jpg', url: 'https://xxx.cdn.com/xxx.jpg' }],
-        'videoList': [{ name: 'food.jpg', url: 'https://xxx.cdn.com/xxx.jpg' }],
-        'isHot': true,
-        'isVideos': true,
-        'goodsStock': 10,
-        'goods_status': 3
-      }],
+      tableData: [],
       appendToBody: true,
       userFrom: {},
       rules: {
@@ -207,7 +168,18 @@ export default {
       }
     }
   },
+  mounted() {
+    this.getGoodsFun()
+  },
   methods: {
+    // 获取全部商品接口
+    getGoodsFun() {
+      let _this = this
+      getGoods().then(res => {
+        console.log(res.data.data)
+        _this.tableData = res.data.data
+      })
+    },
     // 增加商品
     singleCreation() {
       this.$router.push('/createGoods?type=add')

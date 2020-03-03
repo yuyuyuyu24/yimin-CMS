@@ -235,7 +235,7 @@ export default {
         coverList: [],
         swiperList: [],
         videoList: [],
-        goodsStock: 0,
+        goodsStock: 99,
         goods_status: 1
       },
       centerDialogVisible: false,
