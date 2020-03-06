@@ -3,11 +3,15 @@
     <div class="notice-content-header">
       <h1>公告管理</h1>
       <el-button
+        v-if="false"
         type="primary"
         @click="foundNotice"
       >创建公告</el-button>
     </div>
-    <el-card shadow="hover">
+    <el-card
+      v-if="false"
+      shadow="hover"
+    >
       <el-form
         :inline="true"
         size="small"
@@ -63,17 +67,16 @@
         style="width: 100%"
       >
         <el-table-column
-          fixed
           type="index"
           label="序号"
           width="100"
         />
         <el-table-column
-          prop="notice_title"
+          prop="noticeTitle"
           label="标题"
         />
         <el-table-column
-          prop="notice_content"
+          prop="noticeContent"
           width="500"
           label="内容"
         />
@@ -82,8 +85,8 @@
           label="状态"
         >
           <template slot-scope="scope">
-            <span :class="{class1:scope.row.notice_status===1,class2:scope.row.notice_status===2}">
-              {{ changeNoticeStatus(scope.row.notice_status) }}
+            <span :class="{class1:scope.row.noticeStatus===1,class2:scope.row.noticeStatus===2}">
+              {{ changeNoticeStatus(scope.row.noticeStatus) }}
             </span>
           </template>
         </el-table-column>
@@ -92,12 +95,11 @@
           label="弹窗类型"
         >
           <template slot-scope="scope">
-            {{ changeNoticeType(scope.row.notice_type) }}
+            {{ changeNoticeType(scope.row.noticeType) }}
           </template>
         </el-table-column>
         <el-table-column
           label="操作"
-          fixed="right"
           width="200"
         >
           <template slot-scope="scope">
@@ -107,21 +109,23 @@
               @click="edit(scope)"
             >编辑</el-button>
             <el-button
-              type="danger"
+              v-if="scope.row.noticeStatus === 2"
+              type="success"
               size="small"
-              @click="stop(scope)"
-            >停用</el-button>
+              @click="useNotice(scope)"
+            >使用</el-button>
             <el-button
-              v-if="false"
+              v-if="scope.row.noticeStatus === 1"
               type="danger"
               size="small"
-              @click="stop(scope)"
+              @click="stopNotice(scope)"
             >停用</el-button>
 
           </template>
         </el-table-column>
       </el-table>
       <el-pagination
+        v-if="false"
         background
         layout="prev, pager, next, jumper"
         :current-page="currentPage"
@@ -146,9 +150,8 @@
             prop="notice_title"
           >
             <el-input
-              v-model="noticeFrom.notice_title"
+              v-model="noticeFrom.noticeTitle"
               placeholder="请输入标题"
-              @input="test"
             />
           </el-form-item>
           <el-form-item
@@ -156,9 +159,9 @@
             prop="notice_content"
           >
             <el-input
-              v-model="noticeFrom.notice_content"
+              v-model="noticeFrom.noticeContent"
+              autosize
               type="textarea"
-              :rows="2"
               placeholder="请输入内容"
             />
           </el-form-item>
@@ -166,7 +169,11 @@
             label="选择公告类型"
             prop=""
           >
-            <el-radio-group v-model="noticeFrom.notice_type">
+            <el-radio-group
+              v-model="noticeFrom.noticeType"
+              :disabled="true"
+              disable
+            >
               <el-radio label="1">弹窗公告</el-radio>
               <el-radio label="2">首页公告</el-radio>
             </el-radio-group>
@@ -175,9 +182,18 @@
             label="选择公告状态"
             prop=""
           >
-            <el-radio-group v-model="noticeFrom.notice_status">
-              <el-radio label="1">使用</el-radio>
-              <el-radio label="2">停用</el-radio>
+            <el-radio-group
+              v-model="noticeFrom.noticeStatus"
+              :disabled="true"
+            >
+              <el-radio
+                disable
+                :label="1"
+              >使用</el-radio>
+              <el-radio
+                disable
+                :label="2"
+              >停用</el-radio>
             </el-radio-group>
           </el-form-item>
         </el-form>
@@ -197,57 +213,113 @@
 </template>
 
 <script>
+import { getNotice, updateNotice, lowerNotice, upperNotice } from '@/api/notice'
+import { startLoading, closeLoading, message } from '@/utils/loading'
 export default {
   data() {
     return {
       search: {},
       shopList: [],
       currentPage: 1,
-      tableData: [
-        {
-          'notice_title': '牛肉1',
-          'notice_content': '牛肉牛肉',
-          'notice_status': '1',
-          'notice_type': '1'
-        },
-        {
-          'notice_title': '羊肉',
-          'notice_content': '羊肉羊肉',
-          'notice_status': '2',
-          'notice_type': '2'
-        }
-      ],
+      tableData: [],
       dialogVisible: false,
       dialogTitle: '',
       noticeFrom: {
-        notice_title: '',
-        notice_content: '',
-        notice_type: '1',
-        notice_status: '1'
+        noticeTitle: '',
+        noticeContent: '',
+        noticeType: '1',
+        noticeStatus: 1
       },
       noticeDetals: {},
       appendToBody: true,
       rules: {
-        notice_title: [{ required: true, message: '请输入标题', trigger: 'blur' }],
-        notice_content: [{ required: true, message: '请输入内容', trigger: 'blur' }]
-      }
+        noticeTitle: [{ required: true, message: '请输入标题', trigger: 'blur' }],
+        noticeContent: [{ required: true, message: '请输入内容', trigger: 'blur' }]
+      },
+      noticeId: 0
     }
   },
-  watch: {
-    dialogVisible: function(val, oldVal) {
-      setTimeout(() => {
-        console.log(val)
-        console.log(oldVal)
-      }, 100)
-    }
+  mounted() {
+    this.getNoticeFun()
   },
-
   methods: {
-    test() {
-      console.log(this.noticeFrom)
-      console.log(this.tableData)
+    // 获取全部公告
+    getNoticeFun() {
+      let _this = this
+      startLoading()
+      getNotice('notice/getNotice').then(res => {
+        closeLoading()
+        if (res.status !== 200) {
+          message('error', '网络出现问题，请稍后重试！')
+        } else {
+          _this.tableData = res.data.data
+        }
+      })
     },
-    searchShop() { },
+    // 使用公告
+    useNotice(scope) {
+      this.upperNoticeFun(scope)
+    },
+    // 使用公告接口
+    upperNoticeFun(scope, noticeStatus) {
+      let _this = this
+      startLoading()
+      let data = {
+        id: scope.row.id,
+        noticeStatus: 1
+      }
+      upperNotice('notice/upperNotice', data).then(res => {
+        closeLoading()
+        if (res.status !== 200) {
+          message('error', '网络出现问题，请稍后重试！')
+        } else {
+          this.$confirm(`是否使用${_this.changeNoticeType(scope.row.noticeType)}?`, '确认信息', {
+            distinguishCancelAndClose: true,
+            confirmButtonText: '确认',
+            cancelButtonText: '取消'
+          })
+            .then(() => {
+              message('success', `${_this.changeNoticeType(scope.row.noticeType)}使用成功！`)
+              _this.getNoticeFun()
+            })
+            .catch(action => {
+              message('info', '取消')
+            })
+        }
+      })
+    },
+    // 停用公告
+    stopNotice(scope) {
+      this.lowerNoticeFun(scope)
+    },
+    // 停用公告接口
+    lowerNoticeFun(scope, noticeStatus) {
+      let _this = this
+      startLoading()
+      let data = {
+        id: scope.row.id,
+        noticeStatus: 2
+      }
+      lowerNotice('notice/lowerNotice', data).then(res => {
+        closeLoading()
+        if (res.status !== 200) {
+          message('error', '网络出现问题，请稍后重试！')
+        } else {
+          this.$confirm(`是否停用${_this.changeNoticeType(scope.row.noticeType)}?`, '确认信息', {
+            distinguishCancelAndClose: true,
+            confirmButtonText: '确认',
+            cancelButtonText: '取消'
+          })
+            .then(() => {
+              message('success', `${_this.changeNoticeType(scope.row.noticeType)}停用成功！`)
+              _this.getNoticeFun()
+            })
+            .catch(action => {
+              message('info', '取消')
+            })
+        }
+      })
+    },
     handleCurrentChange() { },
     // 创建公告
     foundNotice() {
@@ -258,6 +330,7 @@ export default {
     // 编辑公告
     edit(scope) {
       const _this = this
+      _this.noticeId = scope.row.id
       _this.dialogTitle = '编辑'
       this.noticeFrom = Object.assign({}, scope.row)
       _this.dialogVisible = true
@@ -265,12 +338,13 @@ export default {
     // 取消发布
     handleClose() {
       const _this = this
-      this.$confirm('是否取消发布', '确认信息', {
+      this.$confirm('是否取消编辑?', '确认信息', {
         distinguishCancelAndClose: true,
         confirmButtonText: '确认',
         cancelButtonText: '取消'
       })
         .then(() => {
+          message('info', '取消编辑')
           _this.dialogVisible = false
         })
         .catch(action => {
@@ -281,8 +355,36 @@ export default {
       const _this = this
       this.$refs[form].validate(async(valid) => {
         if (!valid) return false
-        console.log(this.noticeFrom)
-        _this.dialogVisible = false
+      })
+      this.$confirm('是否发布更改后的公告？', '确认信息', {
+        distinguishCancelAndClose: true,
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
+      })
+        .then(() => {
+          this.updateNoticeFun(_this.noticeId, _this.noticeFrom.noticeTitle, _this.noticeFrom.noticeContent)
+        })
+        .catch(action => {
+        })
+    },
+    // 编辑公告接口
+    updateNoticeFun(id, noticeTitle, noticeContent) {
+      let _this = this
+      let data = {
+        id,
+        noticeTitle,
+        noticeContent
+      }
+      startLoading()
+      updateNotice('notice/updateNotice', data).then(res => {
+        closeLoading()
+        if (res.status !== 200) {
+          message('error', '网络出现问题，请稍后重试！')
+        } else {
+          message('success', '公告更改成功！')
+          _this.dialogVisible = false
+          _this.getNoticeFun()
+        }
       })
     },
     // 删除

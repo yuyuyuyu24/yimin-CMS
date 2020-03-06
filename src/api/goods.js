@@ -6,6 +6,11 @@ export async function getGoods(api, data) {
   return axios.get(`${config.api}/${api}`, data)
 }
 
+// 分页获取商品
+export async function pageGetGoods(api, data) {
+  return axios.post(`${config.api}/${api}`, data)
+}
+
 // 根据条件查询商品
 export async function queryGoods(api, data) {
   return axios.post(`${config.api}/${api}`, data)

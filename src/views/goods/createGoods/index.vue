@@ -54,23 +54,7 @@
         label="商品封面:"
         prop="coverList"
       >
-        <el-upload
-          action="https://jsonplaceholder.typicode.com/posts/"
-          :on-preview="coverHandlePreview"
-          :on-remove="coverHandleRemove"
-          :on-success="coverHandleSuccess"
-          :file-list="createFrom.coverList"
-          list-type="picture"
-        >
-          <el-button
-            size="small"
-            type="primary"
-          >点击上传</el-button>
-          <div
-            slot="tip"
-            class="el-upload__tip"
-          >只能上传jpg/png文件，且不超过500kb</div>
-        </el-upload>
+        <cover-upload @coverFile="coverList" />
       </el-form-item>
       <el-form-item
         ref="swiperFrom"
@@ -228,7 +212,11 @@
 <script>
 import { getGoodsDetail } from '@/api/goods'
 import { startLoading, closeLoading, message } from '@/utils/loading'
+import coverUpload from '@/components/upload/coverUpload.vue'
 export default {
+  components: {
+    coverUpload
+  },
   data() {
     return {
       createFrom: {
@@ -302,15 +290,10 @@ export default {
         }
       })
     },
-    coverHandlePreview(file, fileList) {
-      console.log(file, fileList)
-    },
-    coverHandleRemove(file, fileList) {
-      this.createFrom.coverList = fileList
-    },
-    coverHandleSuccess(response, file, fileList) {
-      console.log(fileList)
-      this.createFrom.coverList = fileList
+    // 接受从子组件传过来的cover值
+    coverList(req) {
+      console.log('req===', req)
+      this.createFrom.coverList = req
       this.$refs.coverFrom.clearValidate()
     },
     swiperHandlePreview(file, fileList) {
@@ -341,20 +324,20 @@ export default {
     },
     // 提交
     submit(createFrom) {
-      // this.$refs[createFrom].validate((valid) => {
-      //   if (this.createFrom.coverList.length > 0) {
-      //     this.$refs.coverFrom.clearValidate()
-      //   }
-      //   if (this.createFrom.swiperList.length > 0) {
-      //     this.$refs.swiperFrom.clearValidate()
-      //   }
-      //   if (valid) {
-      //     this.centerDialogVisible = true
-      //   } else {
-      //     console.log('error submit!!')
-      //     return false
-      //   }
-      // })
+      this.$refs[createFrom].validate((valid) => {
+        if (this.createFrom.coverList.length > 0) {
+          this.$refs.coverFrom.clearValidate()
+        }
+        if (this.createFrom.swiperList.length > 0) {
+          this.$refs.swiperFrom.clearValidate()
+        }
+        if (valid) {
+          this.centerDialogVisible = true
+        } else {
+          console.log('error submit!!')
+          return false
+        }
+      })
       if (this.createFrom.goodsStock < 0) {
         return this.$message({
           message: '商品库存量不能为负数!',

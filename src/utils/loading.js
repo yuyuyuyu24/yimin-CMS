@@ -18,11 +18,11 @@ export function closeLoading() {
   loading.close()
 }
 
-export function message() {
+export function message(type, message) {
   return Message({
     showClose: true,
-    message: '网络出现问题，请稍后再试',
-    type: 'error',
-    duration: 3000
+    message: message || '服务错误！请记录出现问题的页面以及引发问题的操作，并联系开发人员。',
+    type: type || 'warning',
+    duration: 5000
   })
 }

@@ -48,8 +48,8 @@ export default {
   },
   data() {
     return {
-      title: 'Vue Admin Template',
-      logo: 'https://wpimg.wallstcn.com/69a1c46c-eb1c-4b46-8bd4-e9e686ef5251.png'
+      title: '清真伊民肉业后台管理系统',
+      logo: 'http://m.qpic.cn/psc?/V12Mh4N601guT1/YWvjNfAyIVey1fwA2tD8GEQzgD16BuMLe7xwefdGnY4tQoqlHOU2o*gu*UB8awTjNZyaMwAaFFbTynVYH3OPVI9Wj.7RNCk2kHKmiOB88zE!/b&bo=ggGCAYIBggEDFzI!&rf=viewer_4&t=5'
     }
   }
 }

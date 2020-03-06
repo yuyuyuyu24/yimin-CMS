@@ -140,10 +140,9 @@
         @click="batchLowerShelf"
       >批量下架商品</el-button>
       <el-pagination
-        background
-        layout="prev, pager, next, jumper"
-        :current-page="currentPage"
-        style="margin-top:30px;"
+        layout="prev, pager, next"
+        :total="tableDataLength"
+        :current-page.sync="currentPage"
         @current-change="handleCurrentChange"
       />
     </el-card>
@@ -151,7 +150,7 @@
 </template>
 
 <script>
-import { getGoods, queryGoods, lowerGoods } from '@/api/goods'
+import { getGoods, queryGoods, lowerGoods, pageGetGoods } from '@/api/goods'
 import { startLoading, closeLoading, message } from '@/utils/loading'
 export default {
   data() {
@@ -161,9 +160,13 @@ export default {
       searchFrom: {
         goodsName: '',
         goodsPrice: '',
-        goodsType: ''
+        goodsType: '',
+        pageSize: 10,
+        pageNumber: 1
       },
       tableData: [],
+      tableDataLength: 0,
+      tableDataType: '',
       appendToBody: true,
       userFrom: {},
       rules: {
@@ -174,7 +177,9 @@ export default {
     }
   },
   mounted() {
+    // 获取所有数据
     this.getGoodsFun()
+    this.pageGetGoodsFun()
   },
   methods: {
     // 获取全部商品接口
@@ -184,7 +189,26 @@ export default {
       getGoods('goods/getGoods').then(res => {
         closeLoading()
         if (res.status !== 200) {
-          message()
+          message('error', '网络出现问题，请稍后重试！')
+        } else {
+          // 分页拿到总共有多少条数据
+          _this.tableDataLength = res.data.data.length
+        }
+      })
+    },
+    // 分页获取全部商品
+    pageGetGoodsFun(e) {
+      let _this = this
+      this.tableDataType = 'page'
+      startLoading()
+      let data = {
+        pageSize: 10,
+        pageNumber: e || 1
+      }
+      pageGetGoods('goods/pageGetGoods', data).then(res => {
+        closeLoading()
+        if (res.status !== 200) {
+          message('error', '网络出现问题，请稍后重试！')
         } else {
           _this.tableData = res.data.data
         }
@@ -200,19 +224,34 @@ export default {
     },
     // 查询
     searchUser(searchFrom) {
-      let _this = this
+      this.tableDataType = 'search'
       // 根据条件查询商品
+      this.queryGoodsFun(searchFrom)
+    },
+    // 查询事件
+    queryGoodsFun(searchFrom) {
+      let _this = this
       startLoading()
       queryGoods('goods/queryGoods', searchFrom).then(res => {
         closeLoading()
         if (res.status !== 200) {
-          message()
+          message('error', '网络出现问题，请稍后重试！')
         } else {
           _this.tableData = res.data.data
         }
       })
     },
-    handleCurrentChange() { },
+    // 分页事件
+    handleCurrentChange(e) {
+      if (this.tableDataType === 'page') {
+        this.pageGetGoodsFun(e)
+      } else {
+        let searchFrom = this.searchFrom
+        searchFrom.pageNumber = e
+        this.queryGoodsFun(searchFrom)
+        this.currentPage = e
+      }
+    },
     // 编辑用户
     edit(scope) {
       this.$router.push(`/createGoods?type=edit&id=${this.Config.ENCODE(scope.row.id)}`)
@@ -229,6 +268,7 @@ export default {
           _this.dialogVisible = false
         })
         .catch(action => {
+          message('info', '取消！')
         })
     },
     // 确定发布
@@ -255,17 +295,15 @@ export default {
           lowerGoods('goods/lowerGoods', data).then(res => {
             closeLoading()
             if (res.status !== 200) {
-              message()
+              message('error', '网络出现问题，请稍后重试！')
             } else {
-              this.$message({
-                message: '修改成功!',
-                type: 'success'
-              })
+              message('success', '修改成功！')
               this.getGoodsFun()
             }
           })
         })
         .catch(action => {
+          message('info', '取消！')
         })
     },
     // 上架商品
@@ -287,7 +325,7 @@ export default {
             goodsStatus: goods_tatus
           }
           startLoading()
-          lowerGoods('goods/lowerGoods', data).then(res => {
+          lowerGoods('goods/upperGoods', data).then(res => {
             closeLoading()
             if (res.status !== 200) {
               message()
@@ -302,6 +340,10 @@ export default {
         })
         .catch(action => {
           console.log(scope.row.goodsStock)
+          this.$message({
+            message: '取消!',
+            type: 'info'
+          })
         })
     },
     // 批量下架商品

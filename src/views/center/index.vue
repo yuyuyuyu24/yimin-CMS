@@ -35,6 +35,7 @@
         <el-button
           size="small"
           plain
+          @click="editAdminHeadFun"
         >提交</el-button>
       </el-form-item>
     </el-form>
@@ -70,6 +71,7 @@
         <el-button
           size="small"
           plain
+          @click="editAdminBgFun"
         >提交</el-button>
       </el-form-item>
     </el-form>
@@ -96,6 +98,7 @@
         <el-button
           size="small"
           plain
+          @click="editAdminWordFun"
         >提交</el-button>
       </el-form-item>
     </el-form>
@@ -119,6 +122,7 @@
         <el-button
           size="small"
           plain
+          @click="editAdminPhoneOneFun"
         >提交</el-button>
       </el-form-item>
     </el-form>
@@ -142,6 +146,7 @@
         <el-button
           size="small"
           plain
+          @click="editAdminPhoneTwoFun"
         >提交</el-button>
       </el-form-item>
     </el-form>
@@ -150,6 +155,8 @@
 </template>
 
 <script>
+import { getAdminDetail, editAdminWord, editAdminPhoneOne, editAdminPhoneTwo } from '@/api/admin'
+import { startLoading, closeLoading, message } from '@/utils/loading'
 
 export default {
   name: 'Center',
@@ -157,12 +164,124 @@ export default {
     return {
       headImgFrom: {},
       bgImgFrom: {},
-      shopReadmeFrom: {},
-      editPhoneOneFrom: {},
-      editPhoneTwoFrom: {}
+      shopReadmeFrom: {
+        'textarea': ''
+      },
+      editPhoneOneFrom: {
+        'phoneOne': ''
+      },
+      editPhoneTwoFrom: {
+        'phoneTwo': ''
+      }
     }
   },
+  mounted() {
+    this.getAdminDetailFun()
+  },
   methods: {
+    // 获取admin信息
+    getAdminDetailFun() {
+      let _this = this
+      startLoading()
+      getAdminDetail('admin/getAdminDetail', { id: 1 }).then(res => {
+        closeLoading()
+        if (res.status !== 200) {
+          message('error', '网络出现问题，请稍后重试！')
+        } else {
+          _this.shopReadmeFrom.textarea = res.data.data.shopWord
+          _this.editPhoneOneFrom.phoneOne = res.data.data.phoneOne
+          _this.editPhoneTwoFrom.phoneTwo = res.data.data.phoneTwo
+        }
+      })
+    },
+    // 修改头像
+    editAdminHeadFun() { },
+    // 修改背景
+    editAdminBgFun() { },
+    // 修改商家简介
+    editAdminWordFun() {
+      this.$confirm('是否修改商家简介?', '确认信息', {
+        distinguishCancelAndClose: true,
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
+      })
+        .then(() => {
+          let _this = this
+          startLoading()
+          let data = {
+            id: 1, shopWord: _this.shopReadmeFrom.textarea
+          }
+          editAdminWord('admin/editAdminWord', data).then(res => {
+            closeLoading()
+            if (res.status !== 200) {
+              message('error', '网络出现问题，请稍后重试！')
+            } else {
+              message('success', '修改成功！')
+              this.getAdminDetailFun()
+              _this.shopReadmeFrom.textarea = res.data.data.shopWord
+            }
+          })
+        })
+        .catch(action => {
+          message('info', '取消！')
+        })
+    },
+    // 修改手机号1
+    editAdminPhoneOneFun() {
+      this.$confirm('是否修改手机号码1?', '确认信息', {
+        distinguishCancelAndClose: true,
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
+      })
+        .then(() => {
+          let _this = this
+          startLoading()
+          let data = {
+            id: 1,
+            phoneOne: _this.editPhoneOneFrom.phoneOne
+          }
+          editAdminPhoneOne('admin/editAdminPhoneOne', data).then(res => {
+            closeLoading()
+            if (res.status !== 200) {
+              message('error', '网络出现问题，请稍后重试！')
+            } else {
+              message('success', '修改成功！')
+              this.getAdminDetailFun()
+            }
+          })
+        })
+        .catch(action => {
+          message('info', '取消！')
+        })
+    },
+    // 修改手机号2
+    editAdminPhoneTwoFun() {
+      this.$confirm('是否修改手机号码2?', '确认信息', {
+        distinguishCancelAndClose: true,
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
+      })
+        .then(() => {
+          let _this = this
+          startLoading()
+          let data = {
+            id: 1,
+            phoneTwo: _this.editPhoneTwoFrom.phoneTwo
+          }
+          editAdminPhoneTwo('admin/editAdminPhoneTwo', data).then(res => {
+            closeLoading()
+            if (res.status !== 200) {
+              message('error', '网络出现问题，请稍后重试！')
+            } else {
+              message('success', '修改成功！')
+              this.getAdminDetailFun()
+            }
+          })
+        })
+        .catch(action => {
+          message('info', '取消！')
+        })
+    },
     headImgPreview(file, fileList) {
       console.log(file, fileList)
     },
