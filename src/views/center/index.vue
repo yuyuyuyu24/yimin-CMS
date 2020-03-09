@@ -13,23 +13,11 @@
         label="修改头像:"
         prop=""
       >
-        <el-upload
-          action="https://jsonplaceholder.typicode.com/posts/"
-          :on-preview="headImgPreview"
-          :on-remove="headImgRemove"
-          :on-success="headImgSuccess"
-          :file-list="headImgFrom.headImgList"
-          list-type="picture"
-        >
-          <el-button
-            size="small"
-            type="primary"
-          >点击上传</el-button>
-          <div
-            slot="tip"
-            class="el-upload__tip"
-          >只能上传jpg/png文件，且不超过500kb</div>
-        </el-upload>
+        <head-upload
+          :headlist="headImgFrom.headList"
+          @headFile="headList"
+          @headFileDel="headFileDel"
+        />
       </el-form-item>
       <el-form-item>
         <el-button
@@ -49,23 +37,11 @@
         label="修改背景图:"
         prop=""
       >
-        <el-upload
-          action="https://jsonplaceholder.typicode.com/posts/"
-          :on-preview="bgImgPreview"
-          :on-remove="bgImgRemove"
-          :on-success="bgImgSuccess"
-          :file-list="bgImgFrom.bgImgList"
-          list-type="picture"
-        >
-          <el-button
-            size="small"
-            type="primary"
-          >点击上传</el-button>
-          <div
-            slot="tip"
-            class="el-upload__tip"
-          >只能上传jpg/png文件，且不超过500kb</div>
-        </el-upload>
+        <bg-img-upload
+          :bgimglist="bgImgFrom.bgImgList"
+          @bgimgFile="bgimgList"
+          @bgimgFileDel="bgimgFileDel"
+        />
       </el-form-item>
       <el-form-item>
         <el-button
@@ -155,15 +131,26 @@
 </template>
 
 <script>
-import { getAdminDetail, editAdminWord, editAdminPhoneOne, editAdminPhoneTwo } from '@/api/admin'
+import { getAdminDetail, editAdminHead, editAdminBg, editAdminWord, editAdminPhoneOne, editAdminPhoneTwo } from '@/api/admin'
 import { startLoading, closeLoading, message } from '@/utils/loading'
+import headUpload from '@/components/upload/headUpload.vue'
+import bgImgUpload from '@/components/upload/bgImgUpload.vue'
+import querystring from 'querystring'
 
 export default {
   name: 'Center',
+  components: {
+    headUpload,
+    bgImgUpload
+  },
   data() {
     return {
-      headImgFrom: {},
-      bgImgFrom: {},
+      headImgFrom: {
+        headList: []
+      },
+      bgImgFrom: {
+        bgImgList: []
+      },
       shopReadmeFrom: {
         'textarea': ''
       },
@@ -172,7 +159,9 @@ export default {
       },
       editPhoneTwoFrom: {
         'phoneTwo': ''
-      }
+      },
+      changeHeadImgFrom: {},
+      changeBgImgFrom: {}
     }
   },
   mounted() {
@@ -188,16 +177,100 @@ export default {
         if (res.status !== 200) {
           message('error', '网络出现问题，请稍后重试！')
         } else {
+          let headList = []
+          if (res.data.data.head === '') {
+            _this.headImgFrom.headList = []
+          } else {
+            headList.push(querystring.parse(res.data.data.head))
+            _this.headImgFrom.headList = headList
+          }
+          let bgimgList = []
+          if (res.data.data.background === '') {
+            _this.bgImgFrom.bgImgList = []
+          } else {
+            bgimgList.push(querystring.parse(res.data.data.background))
+            _this.bgImgFrom.bgImgList = bgimgList
+          }
           _this.shopReadmeFrom.textarea = res.data.data.shopWord
           _this.editPhoneOneFrom.phoneOne = res.data.data.phoneOne
           _this.editPhoneTwoFrom.phoneTwo = res.data.data.phoneTwo
         }
       })
     },
-    // 修改头像
-    editAdminHeadFun() { },
+    // 修改admin头像
+    editAdminHeadFun() {
+      if (this.headImgFrom.headList.length === 0) {
+        return message('warning', '头像不能为空！')
+      }
+      this.$confirm('是否确认修改头像?', '确认信息', {
+        distinguishCancelAndClose: true,
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
+      })
+        .then(() => {
+          let _this = this
+          startLoading()
+          this.changeHeadImgFrom = Object.assign({}, this.headImgFrom)
+          this.changeHeadImgFrom.headList = querystring.stringify(this.changeHeadImgFrom.headList[0])
+          let data = {
+            id: 1,
+            head: _this.changeHeadImgFrom.headList
+          }
+          editAdminHead('admin/editAdminHead', data).then(res => {
+            closeLoading()
+            if (res.data) {
+              this.$alert('头像修改成功!', '提示', {
+                confirmButtonText: '确定',
+                callback: action => {
+                  this.$router.go(0)
+                }
+              })
+            }
+          }).catch(() => {
+            message('error', '网络出现问题，请稍后重试！')
+          })
+        })
+        .catch(action => {
+          message('info', '取消！')
+        })
+    },
     // 修改背景
-    editAdminBgFun() { },
+    editAdminBgFun() {
+      if (this.bgImgFrom.bgImgList.length === 0) {
+        return message('warning', '背景图不能为空！')
+      }
+      this.$confirm('是否确认修改背景图?', '确认信息', {
+        distinguishCancelAndClose: true,
+        confirmButtonText: '确认',
+        cancelButtonText: '取消'
+      })
+        .then(() => {
+          let _this = this
+          startLoading()
+          this.changeBgImgFrom = Object.assign({}, this.bgImgFrom)
+          this.changeBgImgFrom.bgImgList = querystring.stringify(this.changeBgImgFrom.bgImgList[0])
+          let data = {
+            id: 1,
+            background: _this.changeBgImgFrom.bgImgList
+          }
+          editAdminBg('admin/editAdminBg', data).then(res => {
+            closeLoading()
+            if (res.data) {
+              this.$alert('背景图修改成功!', '提示', {
+                confirmButtonText: '确定',
+                callback: action => {
+                  this.$router.go(0)
+                }
+              })
+            }
+          }).catch(() => {
+            message('error', '网络出现问题，请稍后重试！')
+          })
+        })
+        .catch(action => {
+          message('info', '取消！')
+        })
+    },
     // 修改商家简介
     editAdminWordFun() {
       this.$confirm('是否修改商家简介?', '确认信息', {
@@ -213,13 +286,12 @@ export default {
           }
           editAdminWord('admin/editAdminWord', data).then(res => {
             closeLoading()
-            if (res.status !== 200) {
-              message('error', '网络出现问题，请稍后重试！')
-            } else {
+            if (res.data.data) {
               message('success', '修改成功！')
               this.getAdminDetailFun()
-              _this.shopReadmeFrom.textarea = res.data.data.shopWord
             }
+          }).catch(() => {
+            message('error', '网络出现问题，请稍后重试！')
           })
         })
         .catch(action => {
@@ -242,12 +314,12 @@ export default {
           }
           editAdminPhoneOne('admin/editAdminPhoneOne', data).then(res => {
             closeLoading()
-            if (res.status !== 200) {
-              message('error', '网络出现问题，请稍后重试！')
-            } else {
+            if (res.data.data) {
               message('success', '修改成功！')
               this.getAdminDetailFun()
             }
+          }).catch(() => {
+            message('error', '网络出现问题，请稍后重试！')
           })
         })
         .catch(action => {
@@ -270,33 +342,31 @@ export default {
           }
           editAdminPhoneTwo('admin/editAdminPhoneTwo', data).then(res => {
             closeLoading()
-            if (res.status !== 200) {
-              message('error', '网络出现问题，请稍后重试！')
-            } else {
+            if (res.data) {
               message('success', '修改成功！')
               this.getAdminDetailFun()
             }
+          }).catch(() => {
+            message('error', '网络出现问题，请稍后重试！')
           })
         })
         .catch(action => {
           message('info', '取消！')
         })
     },
-    headImgPreview(file, fileList) {
-      console.log(file, fileList)
+    // 接受从子组件传过来的head值
+    headList(req) {
+      this.headImgFrom.headList = req
     },
-    headImgRemove(file, fileList) {
+    headFileDel(req) {
+      this.headImgFrom.headList = req
     },
-    headImgSuccess(response, file, fileList) {
-      console.log(fileList)
+    // 接受从子组件传过来的bgimg值
+    bgimgList(req) {
+      this.bgImgFrom.bgImgList = req
     },
-    bgImgPreview(file, fileList) {
-      console.log(file, fileList)
-    },
-    bgImgRemove(file, fileList) {
-    },
-    bgImgSuccess(response, file, fileList) {
-      console.log(fileList)
+    bgimgFileDel(req) {
+      this.bgImgFrom.bgImgList = req
     }
   }
 }
@@ -318,7 +388,7 @@ export default {
     margin-bottom: 30px;
   }
   &-content-from {
-    width: 500px;
+    width: 700px;
     margin-bottom: 50px;
     display: flex;
     justify-content: space-between;

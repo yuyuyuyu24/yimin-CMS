@@ -1,5 +1,5 @@
 <template>
-  <div class="upload">
+  <div>
     <el-upload
       :data="uploadData"
       :action="Config.QI_NIU_UPLOAD"
@@ -10,8 +10,7 @@
       :http-request="upload"
       list-type="picture"
       accept="image/jpeg,image/gif,image/png,image/bmp"
-      :limit="1"
-      :on-exceed="exceed"
+      multiple
     >
       <el-button
         size="small"
@@ -32,7 +31,7 @@ import { message } from '@/utils/loading'
 
 export default {
   props: {
-    coverlist: {
+    swiperlist: {
       type: Array,
       default() {
         return []
@@ -48,10 +47,10 @@ export default {
     }
   },
   watch: {
-    coverlist: {
+    swiperlist: {
       deep: true,
       handler() {
-        this.fileList = this.coverlist
+        this.fileList = this.swiperlist
       }
     }
   },
@@ -73,16 +72,13 @@ export default {
       }
     },
     // 获取上传进度
-    progress(res) {
-      this.upLoadProgress = res
-    },
+    progress(res) { },
     upload(req) {
       const formdata = new FormData()
       this.uploadData.key = `upload_pic_${new Date().getTime()}_${req.file.name}`
       formdata.append('file', req.file)
       formdata.append('token', this.uploadData.token)
       formdata.append('key', this.uploadData.key)
-      this.isUpload = true
       qiniuUpload(this.Config.QI_NIU_DIMAIN, formdata, this.progress).then((res) => {
         this.imageUrl = this.Config.QI_NIU_UPLOAD + '/' + res.data.key
         let file = {
@@ -90,7 +86,7 @@ export default {
           url: this.imageUrl
         }
         this.fileList.push(file)
-        this.$emit('coverFile', this.fileList)
+        this.$emit('swiperFile', this.fileList)
       })
     },
     uploadError(err, file, fileList) {
@@ -102,13 +98,19 @@ export default {
     },
     doDeleteImg(file, fileList) {
       this.fileList = fileList
-      this.$emit('coverFileDel', this.fileList)
+      this.$emit('swiperFile', this.fileList)
     },
     // 上传文件限制
     beforeAvatarUpload(file) {
       if (!funcChina(file.name)) {
         message('warning', '图片名称不能含有中文！请修改后重新上传。')
         return false
+      }
+      for (let i = 0; i < this.fileList.length; i++) {
+        if (file.name === this.fileList[i].name) {
+          this.$message.error('该张已上传过，请不要重复上传!')
+          return false
+        }
       }
       const isPNG = file.type === 'image/png'
       const isJPEG = file.type === 'image/jpeg'
@@ -118,18 +120,7 @@ export default {
         this.$message.error('上传头像图片只能是 jpg、png、jpeg 格式!')
         return false
       }
-    },
-    exceed() {
-      message('warning', '商品封面只能为一张，如果需要更换封面把刚上传的封面删除即可。')
     }
-
   }
 }
 </script>
-<style lang="scss">
-.upload {
-  .el-progress {
-    margin-top: 20px;
-  }
-}
-</style>

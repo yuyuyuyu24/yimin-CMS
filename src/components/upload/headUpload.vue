@@ -26,13 +26,12 @@
 </template>
 <script>
 import { qiniutoken, qiniuUpload } from '@/api/qiniu'
-// import axios from 'axios'
 import { setCookie, getCookie, funcChina } from '@/utils/function'
 import { message } from '@/utils/loading'
 
 export default {
   props: {
-    coverlist: {
+    headlist: {
       type: Array,
       default() {
         return []
@@ -48,10 +47,10 @@ export default {
     }
   },
   watch: {
-    coverlist: {
+    headlist: {
       deep: true,
       handler() {
-        this.fileList = this.coverlist
+        this.fileList = this.headlist
       }
     }
   },
@@ -90,7 +89,7 @@ export default {
           url: this.imageUrl
         }
         this.fileList.push(file)
-        this.$emit('coverFile', this.fileList)
+        this.$emit('headFile', this.fileList)
       })
     },
     uploadError(err, file, fileList) {
@@ -102,7 +101,7 @@ export default {
     },
     doDeleteImg(file, fileList) {
       this.fileList = fileList
-      this.$emit('coverFileDel', this.fileList)
+      this.$emit('headFileDel', this.fileList)
     },
     // 上传文件限制
     beforeAvatarUpload(file) {
@@ -120,7 +119,7 @@ export default {
       }
     },
     exceed() {
-      message('warning', '商品封面只能为一张，如果需要更换封面把刚上传的封面删除即可。')
+      message('warning', '头像只能为一张，如果需要更换头像把刚上传的封面删除即可。')
     }
 
   }

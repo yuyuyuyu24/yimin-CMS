@@ -152,6 +152,7 @@
 <script>
 import { getGoods, queryGoods, lowerGoods, pageGetGoods } from '@/api/goods'
 import { startLoading, closeLoading, message } from '@/utils/loading'
+import { changeQuerystring } from '@/utils/function'
 export default {
   data() {
     return {
@@ -188,12 +189,11 @@ export default {
       startLoading()
       getGoods('goods/getGoods').then(res => {
         closeLoading()
-        if (res.status !== 200) {
-          message('error', '网络出现问题，请稍后重试！')
-        } else {
-          // 分页拿到总共有多少条数据
+        if (res.data.data) {
           _this.tableDataLength = res.data.data.length
         }
+      }).catch(() => {
+        message('error', '服务器出现问题，请稍后重试！')
       })
     },
     // 分页获取全部商品
@@ -207,11 +207,11 @@ export default {
       }
       pageGetGoods('goods/pageGetGoods', data).then(res => {
         closeLoading()
-        if (res.status !== 200) {
-          message('error', '网络出现问题，请稍后重试！')
-        } else {
-          _this.tableData = res.data.data
+        if (res.data.data) {
+          _this.tableData = changeQuerystring(res.data.data)
         }
+      }).catch(() => {
+        message('error', '网络出现问题，请稍后重试！')
       })
     },
     // 增加商品
@@ -234,11 +234,11 @@ export default {
       startLoading()
       queryGoods('goods/queryGoods', searchFrom).then(res => {
         closeLoading()
-        if (res.status !== 200) {
-          message('error', '网络出现问题，请稍后重试！')
-        } else {
-          _this.tableData = res.data.data
+        if (res.data.data) {
+          _this.tableData = changeQuerystring(res.data.data)
         }
+      }).catch(() => {
+        message('error', '网络出现问题，请稍后重试！')
       })
     },
     // 分页事件
@@ -294,11 +294,9 @@ export default {
           startLoading()
           lowerGoods('goods/lowerGoods', data).then(res => {
             closeLoading()
-            if (res.status !== 200) {
-              message('error', '网络出现问题，请稍后重试！')
-            } else {
+            if (res.data.data) {
               message('success', '修改成功！')
-              this.getGoodsFun()
+              this.pageGetGoodsFun()
             }
           })
         })
@@ -334,12 +332,13 @@ export default {
                 message: '修改成功!',
                 type: 'success'
               })
-              this.getGoodsFun()
+              this.pageGetGoodsFun()
             }
+          }).catch(() => {
+            message('error', '网络出现问题，请稍后重试！')
           })
         })
         .catch(action => {
-          console.log(scope.row.goodsStock)
           this.$message({
             message: '取消!',
             type: 'info'

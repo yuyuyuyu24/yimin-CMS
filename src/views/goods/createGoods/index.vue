@@ -5,7 +5,7 @@
     </div>
     <el-form
       ref="createFrom"
-      label-width="auto"
+      label-width="160px"
       label-position="left"
       class="create-content-from"
       :model="createFrom"
@@ -54,30 +54,23 @@
         label="商品封面:"
         prop="coverList"
       >
-        <cover-upload @coverFile="coverList" />
+        <cover-upload
+          :coverlist="createFrom.coverList"
+          @coverFile="coverList"
+          @coverFileDel="coverListDel"
+        />
+        <p>注：建议把商品封面当做轮播图的第一张图，所以需要在商品轮播图处重新上传一次商品封面图片。</p>
       </el-form-item>
       <el-form-item
         ref="swiperFrom"
         label="商品轮播图:"
         prop="swiperList"
       >
-        <el-upload
-          action="https://jsonplaceholder.typicode.com/posts/"
-          :on-preview="swiperHandlePreview"
-          :on-remove="swiperHandleRemove"
-          :on-success="swiperHandleSuccess"
-          :file-list="createFrom.swiperList"
-          list-type="picture"
-        >
-          <el-button
-            size="small"
-            type="primary"
-          >点击上传</el-button>
-          <div
-            slot="tip"
-            class="el-upload__tip"
-          >只能上传jpg/png文件，且不超过500kb</div>
-        </el-upload>
+        <swiper-upload
+          :swiperlist="createFrom.swiperList"
+          @swiperFile="swiperList"
+        />
+        <p>注：轮播图按顺序上传，第一张上传的图片即为第一张轮播图，以此类推。</p>
       </el-form-item>
       <el-form-item label="是否有商品视频:">
         <el-switch
@@ -85,29 +78,17 @@
           active-color="#13ce66"
           active-text="是"
           inactive-text="否"
-          @change="isVideosFun"
         />
         <p>注：该选项可以不填，默认为否。</p>
       </el-form-item>
       <el-form-item
-        v-if="createFrom.isVideos"
+        v-show="createFrom.isVideos"
         label="商品视频:"
       >
-        <el-upload
-          action="https://jsonplaceholder.typicode.com/posts/"
-          :on-preview="videoHandlePreview"
-          :on-remove="videoHandleRemove"
-          :file-list="createFrom.videoList"
-        >
-          <el-button
-            size="small"
-            type="primary"
-          >点击上传</el-button>
-          <div
-            slot="tip"
-            class="el-upload__tip"
-          >只能上传mp4文件</div>
-        </el-upload>
+        <video-upload
+          :videolist="createFrom.videoList"
+          @videoFile="videoList"
+        />
       </el-form-item>
       <el-form-item label="该商品是否为热门商品:">
         <el-switch
@@ -138,10 +119,6 @@
           placeholder="请选择"
         >
           <el-option
-            label="全部"
-            value=""
-          />
-          <el-option
             v-for="(v, k, i) in Config.MEAT_TYPE.MEAT_TYPE_STATUS()"
             :key="i"
             :label="v"
@@ -159,7 +136,8 @@
     <el-dialog
       title="提示"
       :visible.sync="centerDialogVisible"
-      width="40%"
+      width="400"
+      :before-close="handleClose"
     >
       <p>请检查商品信息，确认无误后点击确定即可发布商品！</p>
       <span>
@@ -175,16 +153,45 @@
         商品单位:{{ createFrom.goodsUnit }}
       </span>
       <span>
-        商品封面:{{ createFrom.coverList }}
+        商品封面:
+        <br>
+        <div class="upload-img">
+          <img
+            v-for="(item,index) in createFrom.coverList"
+            :key="index"
+            :src="item.url"
+          >
+        </div>
       </span>
       <span>
-        商品轮播图:{{ createFrom.swiperList }}
+        商品轮播图:
+        <br>
+        <div class="upload-img">
+          <img
+            v-for="(item,index) in createFrom.swiperList"
+            :key="index"
+            :src="item.url"
+          >
+        </div>
       </span>
       <span>
         是否有商品视频:{{ createFrom.isVideos===false ?'否':'是' }}
       </span>
       <span v-if="createFrom.isVideos">
-        商品视频:{{ createFrom.videoList }}
+        商品视频:
+        <br>
+        <div class="goods-video">
+          <div
+            v-for="(item,index) in createFrom.videoList"
+            :key="index"
+            class="goods-video-box"
+          >
+            <span class="svg-container">
+              <svg-icon icon-class="video" />
+            </span>
+            <h3>{{ item.name }}</h3>
+          </div>
+        </div>
       </span>
       <span>
         该商品是否为热门商品:{{ createFrom.isHot===false ?'否':'是' }}
@@ -195,14 +202,11 @@
       <span>
         商品分类:{{ changeGoodsType(createFrom.goodsType) }}
       </span>
-      <span
-        slot="footer"
-        class="dialog-footer"
-      >
-        <el-button @click="centerDialogVisible = false">取 消</el-button>
+      <span slot="footer">
+        <el-button @click="handleClose">取 消</el-button>
         <el-button
           type="primary"
-          @click="centerDialogVisible = false"
+          @click="createGoods"
         >确 定</el-button>
       </span>
     </el-dialog>
@@ -210,12 +214,19 @@
 </template>
 
 <script>
-import { getGoodsDetail } from '@/api/goods'
+import { getGoodsDetail, newGoods, upGoodsData } from '@/api/goods'
 import { startLoading, closeLoading, message } from '@/utils/loading'
 import coverUpload from '@/components/upload/coverUpload.vue'
+import swiperUpload from '@/components/upload/swiperUpload.vue'
+import videoUpload from '@/components/upload/videoUpload.vue'
+import querystring from 'querystring'
+import { changeQuerystringDetail } from '@/utils/function'
+
 export default {
   components: {
-    coverUpload
+    coverUpload,
+    swiperUpload,
+    videoUpload
   },
   data() {
     return {
@@ -253,17 +264,20 @@ export default {
         goodsType: [
           { required: true, message: '请选择商品类型', trigger: 'blur' }
         ]
-      }
-
+      },
+      swiperListChange: [],
+      videoListChange: [],
+      createFromChange: {},
+      pageType: ''
     }
   },
   mounted() {
     if (this.$route.query.type === 'edit') {
       let id = this.Config.UNENCODE(this.$route.query.id)
       this.getGoodsFun({ id })
+      this.pageType = 'edit'
     } if (this.$route.query.type === 'add') {
-      console.log(this.createFrom)
-      return this.createFrom
+      this.pageType = 'add'
     }
   },
   methods: {
@@ -273,9 +287,7 @@ export default {
       startLoading()
       getGoodsDetail('goods/getGoodsDetail', { id }).then(res => {
         closeLoading()
-        if (res.status !== 200) {
-          message()
-        } else {
+        if (res.data.data) {
           if (res.data.data.isHot === 0) {
             res.data.data.isHot = false
           } else {
@@ -286,34 +298,26 @@ export default {
           } else {
             res.data.data.isVideos = true
           }
-          _this.createFrom = res.data.data
+          _this.createFrom = changeQuerystringDetail(res.data.data)
         }
+      }).catch(() => {
+        message('error', '网络出现问题，请稍后重试！')
       })
     },
     // 接受从子组件传过来的cover值
     coverList(req) {
-      console.log('req===', req)
       this.createFrom.coverList = req
       this.$refs.coverFrom.clearValidate()
     },
-    swiperHandlePreview(file, fileList) {
-      console.log(file, fileList)
+    coverListDel(req) {
+      this.createFrom.coverList = req
     },
-    swiperHandleRemove(file, fileList) {
-      this.createFrom.swiperList = fileList
-    },
-    swiperHandleSuccess(response, file, fileList) {
-      this.createFrom.swiperList = fileList
+    swiperList(req) {
+      this.createFrom.swiperList = req
       this.$refs.swiperFrom.clearValidate()
     },
-    videoHandlePreview(file, fileList) {
-      console.log(file, fileList)
-    },
-    videoHandleRemove(file) {
-      console.log(file)
-    },
-    // 是否有商品视频
-    isVideosFun() {
+    videoList(req) {
+      this.createFrom.videoList = req
     },
     // 是否为热门商品
     isHotFun() {
@@ -322,7 +326,41 @@ export default {
     changeGoodsType(val) {
       return this.Config.MEAT_TYPE.MEAT_TYPE_STATUS(val)
     },
-    // 提交
+    // 创建商品接口
+    newGoodsFun(data) {
+      startLoading()
+      newGoods('goods/newGoods', data).then(res => {
+        closeLoading()
+        if (res.data.data) {
+          this.$alert('商品创建成功!', '提示', {
+            confirmButtonText: '确定',
+            callback: action => {
+              this.$router.push('/goods')
+            }
+          })
+        }
+      }).catch(() => {
+        message('error', '网络出现问题，请稍后重试！')
+      })
+    },
+    // 编辑商品接口
+    upGoodsDataFun(data) {
+      startLoading()
+      upGoodsData('goods/upGoodsData', data).then(res => {
+        closeLoading()
+        if (res.data.data) {
+          this.$alert('商品编辑成功!', '提示', {
+            confirmButtonText: '确定',
+            callback: action => {
+              this.$router.push('/goods')
+            }
+          })
+        }
+      }).catch(() => {
+        message('error', '网络出现问题，请稍后重试！')
+      })
+    },
+    // 提交表单
     submit(createFrom) {
       this.$refs[createFrom].validate((valid) => {
         if (this.createFrom.coverList.length > 0) {
@@ -334,7 +372,6 @@ export default {
         if (valid) {
           this.centerDialogVisible = true
         } else {
-          console.log('error submit!!')
           return false
         }
       })
@@ -344,16 +381,57 @@ export default {
           type: 'warning'
         })
       }
-
       if (this.createFrom.goodsStock === 0) {
-        this.createFrom.goods_status = 2
-      } else {
-        this.createFrom.goods_status = 1
+        this.createFrom.goodsStatus = 2
+      } else if (this.createFrom.goodsStock > 0 && this.createFrom.goodsStatus === 3) {
+        this.createFrom.goodsStatus = 3
+      } else if (this.createFrom.goodsStock > 0) {
+        this.createFrom.goodsStatus = 1
       }
-      console.log(typeof this.createFrom.goodsStock)
-      console.log(this.createFrom.goodsStock)
-    }
+    },
+    // 创建商品
+    createGoods() {
+      // 进行转换，因为涉及到换值
+      this.createFromChange = Object.assign({}, this.createFrom)
+      if (this.createFromChange.isHot === false) {
+        this.createFromChange.isHot = 0
+      } else {
+        this.createFromChange.isHot = 1
+      }
+      if (this.createFromChange.isVideos === false) {
+        this.createFromChange.isVideos = 0
+      } else {
+        this.createFromChange.isVideos = 1
+      }
+      this.createFromChange.coverList = querystring.stringify(this.createFromChange.coverList[0])
+      let swiperList = []
+      for (let i = 0; i < this.createFromChange.swiperList.length; i++) {
+        swiperList.push(querystring.stringify(this.createFromChange.swiperList[i]))
+      }
+      this.createFromChange.swiperList = "'" + swiperList + "'"
 
+      if (this.createFromChange.videoList.length === 0) {
+        this.createFromChange.videoList = ''
+      } else {
+        this.createFromChange.videoList = querystring.stringify(this.createFromChange.videoList[0])
+      }
+
+      if (this.pageType === 'edit') {
+        this.upGoodsDataFun(this.createFromChange)
+      } else {
+        this.newGoodsFun(this.createFromChange)
+      }
+    },
+
+    // esc关闭dialog
+    handleClose(done) {
+      this.$confirm('确认关闭？')
+        .then(_ => {
+          // done()
+          this.centerDialogVisible = false
+        })
+        .catch(_ => { })
+    }
   }
 }
 </script>
@@ -393,6 +471,30 @@ export default {
     }
     span {
       padding: 10px 0;
+    }
+  }
+  .upload-img {
+    width: 100%;
+    display: flex;
+    margin: 10px 0;
+    flex-wrap: wrap;
+    img {
+      width: 100px;
+      height: 100px;
+      margin-right: 10px;
+    }
+  }
+  .goods-video {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    .goods-video-box {
+      display: flex;
+      align-items: center;
+      h3 {
+        margin: 15px 0 15px 10px;
+        font-weight: 100;
+      }
     }
   }
 }

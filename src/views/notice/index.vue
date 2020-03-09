@@ -249,11 +249,11 @@ export default {
       startLoading()
       getNotice('notice/getNotice').then(res => {
         closeLoading()
-        if (res.status !== 200) {
-          message('error', '网络出现问题，请稍后重试！')
-        } else {
+        if (res.data.data) {
           _this.tableData = res.data.data
         }
+      }).catch(() => {
+        message('error', '网络出现问题，请稍后重试！')
       })
     },
     // 使用公告
@@ -270,9 +270,7 @@ export default {
       }
       upperNotice('notice/upperNotice', data).then(res => {
         closeLoading()
-        if (res.status !== 200) {
-          message('error', '网络出现问题，请稍后重试！')
-        } else {
+        if (res.data) {
           this.$confirm(`是否使用${_this.changeNoticeType(scope.row.noticeType)}?`, '确认信息', {
             distinguishCancelAndClose: true,
             confirmButtonText: '确认',
@@ -286,6 +284,8 @@ export default {
               message('info', '取消')
             })
         }
+      }).catch(() => {
+        message('error', '网络出现问题，请稍后重试！')
       })
     },
     // 停用公告
@@ -302,9 +302,7 @@ export default {
       }
       lowerNotice('notice/lowerNotice', data).then(res => {
         closeLoading()
-        if (res.status !== 200) {
-          message('error', '网络出现问题，请稍后重试！')
-        } else {
+        if (res.data) {
           this.$confirm(`是否停用${_this.changeNoticeType(scope.row.noticeType)}?`, '确认信息', {
             distinguishCancelAndClose: true,
             confirmButtonText: '确认',
@@ -318,6 +316,8 @@ export default {
               message('info', '取消')
             })
         }
+      }).catch(() => {
+        message('error', '网络出现问题，请稍后重试！')
       })
     },
     handleCurrentChange() { },
@@ -378,31 +378,13 @@ export default {
       startLoading()
       updateNotice('notice/updateNotice', data).then(res => {
         closeLoading()
-        if (res.status !== 200) {
-          message('error', '网络出现问题，请稍后重试！')
-        } else {
+        if (res.data) {
           message('success', '公告更改成功！')
           _this.dialogVisible = false
           _this.getNoticeFun()
         }
-      })
-    },
-    // 删除
-    stop(scope) {
-      this.$confirm(`是否删除该条公告?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        })
       }).catch(() => {
-        this.$message({
-          type: 'info',
-          message: '已取消删除'
-        })
+        message('error', '网络出现问题，请稍后重试！')
       })
     },
     // 转换公告状态

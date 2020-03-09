@@ -25,3 +25,13 @@ export async function lowerGoods(api, data) {
 export async function getGoodsDetail(api, data) {
   return axios.post(`${config.api}/${api}`, data)
 }
+
+// 创建商品
+export async function newGoods(api, data) {
+  return axios.post(`${config.api}/${api}`, data)
+}
+
+// 编辑商品
+export async function upGoodsData(api, data) {
+  return axios.post(`${config.api}/${api}`, data)
+}

@@ -26,13 +26,12 @@
 </template>
 <script>
 import { qiniutoken, qiniuUpload } from '@/api/qiniu'
-// import axios from 'axios'
 import { setCookie, getCookie, funcChina } from '@/utils/function'
 import { message } from '@/utils/loading'
 
 export default {
   props: {
-    coverlist: {
+    bgimglist: {
       type: Array,
       default() {
         return []
@@ -48,10 +47,10 @@ export default {
     }
   },
   watch: {
-    coverlist: {
+    bgimglist: {
       deep: true,
       handler() {
-        this.fileList = this.coverlist
+        this.fileList = this.bgimglist
       }
     }
   },
@@ -90,7 +89,7 @@ export default {
           url: this.imageUrl
         }
         this.fileList.push(file)
-        this.$emit('coverFile', this.fileList)
+        this.$emit('bgimgFile', this.fileList)
       })
     },
     uploadError(err, file, fileList) {
@@ -102,7 +101,7 @@ export default {
     },
     doDeleteImg(file, fileList) {
       this.fileList = fileList
-      this.$emit('coverFileDel', this.fileList)
+      this.$emit('bgimgFileDel', this.fileList)
     },
     // 上传文件限制
     beforeAvatarUpload(file) {
@@ -115,12 +114,12 @@ export default {
       const isJPG = file.type === 'image/jpg'
 
       if (!isPNG && !isJPEG && !isJPG) {
-        this.$message.error('上传头像图片只能是 jpg、png、jpeg 格式!')
+        this.$message.error('上传背景图图片只能是 jpg、png、jpeg 格式!')
         return false
       }
     },
     exceed() {
-      message('warning', '商品封面只能为一张，如果需要更换封面把刚上传的封面删除即可。')
+      message('warning', '背景图只能为一张，如果需要更换背景图把刚上传的封面删除即可。')
     }
 
   }
