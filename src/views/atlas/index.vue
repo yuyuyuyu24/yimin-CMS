@@ -25,25 +25,34 @@
           label="名称"
           prop="name"
           width="200"
-        />
+        >
+          <template slot-scope="scope">
+            <span>
+              {{ scope.row.atlasName }}
+            </span>
+          </template>
+        </el-table-column>
         <el-table-column
           label="图片数量"
           width="200"
         >
           <template slot-scope="scope">
             <span>
-              {{ scope.row.imgs.length }}
+              {{ changeAtlasList(scope) }}
             </span>
           </template>
         </el-table-column>
         <el-table-column label="图集封面">
           <template slot-scope="scope">
-            <img :src="scope.row.imgs[0]">
+            <img
+              v-if="scope.row.atlasImgs[0].url"
+              :src="scope.row.atlasImgs[0].url"
+            >
           </template>
         </el-table-column>
         <el-table-column
           label="操作"
-          width="300"
+          width="200"
         >
           <template slot-scope="scope">
             <el-button
@@ -59,43 +68,62 @@
 </template>
 
 <script>
+import { getAtlas } from '@/api/atlas'
+import { startLoading, closeLoading, message } from '@/utils/loading'
+import querystring from 'querystring'
 
 export default {
   name: 'Atlas',
   data() {
     return {
-      atlasData: [
-        { name: '店铺实拍',
-          imgs:
-            [
-              'https://dss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=3134936990,1473651008&fm=26&gp=0.jpg',
-              'https://www.baidu.com/img/bd_logo1.png',
-              'http://m.qpic.cn/psc?/V12Mh4N601guT1/YWvjNfAyIVey1fwA2tD8GHWaAsaj1.TRUMMoIGhP4xqqhcZz2bs41kt9EolGWcCbdgBhttaxiPAUMc2DdNgHz59x59Y*kYic53AWiUN594s!/b&bo=rgGuAa4BrgERFyA!&rf=viewer_4&t=5',
-              'http://m.qpic.cn/psc?/V12Mh4N601guT1/YWvjNfAyIVey1fwA2tD8GJMDrkW0t8nPeOwoDxmItcDK68DgRruvT56E2lQB5mbg5aQjPVpkGufHbpsfl3t1otcVsI3M2qV9LewaKGd2mgQ!/b&bo=VQhABlUIQAYRNwA!&rf=viewer_4&t=5'
-            ],
-          id: 0
-        },
-        { 'name': '店铺实拍2',
-          'imgs':
-            ['https://dss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=3134936990,1473651008&fm=26&gp=0.jpg',
-              'https://dss0.bdstatic.com/70cFvHSh_Q1YnxGkpoWK1HF6hhy/it/u=3134936990,1473651008&fm=26&gp=0.jpg'],
-          'id': 1
-        }
-      ]
+      atlasData: []
     }
   },
   mounted() {
-    console.log(this.$store)
+    // console.log(this.$store)
+    this.getSwiperFun()
   },
   methods: {
+    // 获取全部图集
+    getSwiperFun() {
+      // let _this = this
+      startLoading()
+      getAtlas('atlas/getAtlas').then(res => {
+        closeLoading()
+        if (res.data.data) {
+          for (let i = 0; i < res.data.data.length; i++) {
+            res.data.data[i].atlasImgs = res.data.data[i].atlasImgs.substr(1).substring(0, res.data.data[i].atlasImgs.length - 1)
+            res.data.data[i].atlasImgs = res.data.data[i].atlasImgs.split(',')
+            let atlasImgs = []
+            for (let j = 0; j < res.data.data[i].atlasImgs.length; j++) {
+              atlasImgs.push(querystring.parse(res.data.data[i].atlasImgs[j]))
+            }
+            res.data.data[i].atlasImgs = atlasImgs
+            this.atlasData = res.data.data
+            console.log(this.atlasData[i].atlasImgs[0].url)
+          }
+        }
+      }).catch(() => {
+        message('error', '网络出现问题，请稍后重试！')
+      })
+    },
     // 增加图集
     addAtlas() {
       this.$router.push('/addAtlas')
     },
     // 查看图集
     checkAtlas(scope) {
-      let data = JSON.stringify(scope.row)
-      this.$router.push(`/editAtlas?data=${encodeURIComponent(data)}`)
+      this.$router.push(`/editAtlas?id=${this.Config.ENCODE(scope.row.id)}`)
+    },
+    // 转换图集内图片长度
+    changeAtlasList(scope) {
+      for (let i = 0; i < scope.row.atlasImgs.length; i++) {
+        if (scope.row.atlasImgs[i].url === undefined) {
+          return 0
+        } else {
+          return scope.row.atlasImgs.length
+        }
+      }
     }
 
   }

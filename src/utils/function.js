@@ -2,7 +2,7 @@ import querystring from 'querystring'
 
 export function setCookie(name, value, esp) {
   var exp = new Date()
-  exp.setTime(exp.getTime() + esp * 24 * 60 * 60 * 1000 * 365)
+  exp.setTime(exp.getTime() + esp * 24 * 60 * 60 * 1000)
   document.cookie = name + '=' + escape(value) + ';expires=' + exp.toGMTString() + ';path=/'
 }
 
@@ -67,6 +67,19 @@ export function changeQuerystringDetail(data) {
     videoList.push(querystring.parse(data.videoList))
     data.videoList = videoList
   }
+  return data
+}
+
+// 把数据库中的string格式的数组转成数组  编辑图集
+export function changeQuerystringEditAtlas(data) {
+  data.atlasImgs = data.atlasImgs.substr(1).substring(0, data.atlasImgs.length - 1)
+  data.atlasImgs = data.atlasImgs.split(',')
+  let atlasImgs = []
+  for (let j = 0; j < data.atlasImgs.length; j++) {
+    atlasImgs.push(querystring.parse(data.atlasImgs[j]))
+  }
+  data.atlasImgs = atlasImgs
+
   return data
 }
 

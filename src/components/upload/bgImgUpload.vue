@@ -64,7 +64,7 @@ export default {
         qiniutoken('goods/token').then((res) => {
           if (res.status === 200) {
             // 储存1年
-            setCookie('qiniutoken', res.data.message, 1)
+            setCookie('qiniutoken', res.data.message, 365)
           }
         })
       } else {

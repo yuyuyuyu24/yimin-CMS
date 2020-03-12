@@ -5,7 +5,7 @@
     </div>
     <el-card>
       <div slot="header">
-        <span>{{ atlasData.name }}</span>
+        <span>{{ atlasList.atlasName }}</span>
       </div>
       <div class="editAtlas-card-body-button">
         <el-button
@@ -14,7 +14,7 @@
           @click="batchEdit"
         >批量管理</el-button>
         <el-button
-          v-if="!isBatch"
+          v-if="false"
           type="success"
           @click="editCover"
         >调整封面</el-button>
@@ -48,11 +48,11 @@
           @change="handleCheckedCitiesChange"
         >
           <div
-            v-for="(item,i) in atlasList.imgs"
+            v-for="(item,i) in atlasList.atlasImgs"
             :key="i"
             class="checkbox"
           >
-            <img :src="item">
+            <img :src="item.url">
             <el-checkbox
               v-if="isBatch"
               :label="i"
@@ -69,28 +69,14 @@
       </div>
     </el-card>
     <el-dialog
-      title="上传轮播图"
+      title="上传图片"
       :visible.sync="dialogVisible"
       width="500px"
     >
-      <el-upload
-        class="upload-demo"
-        action="https://jsonplaceholder.typicode.com/posts/"
-        :on-preview="handlePreview"
-        :on-remove="handleRemove"
-        :on-success="handlescuess"
-        :file-list="fileList"
-        list-type="picture"
-      >
-        <el-button
-          size="small"
-          type="primary"
-        >点击上传</el-button>
-        <div
-          slot="tip"
-          class="el-upload__tip"
-        >只能上传jpg/png文件，且不超过500kb</div>
-      </el-upload>
+      <edit-atlas-upload
+        @editAtlasUploadFile="editAtlasList"
+        @editAtlasUploadDel="editAtlasListDel"
+      />
       <span
         slot="footer"
         class="dialog-footer"
@@ -98,7 +84,7 @@
         <el-button @click="dialogVisible = false">取 消</el-button>
         <el-button
           type="primary"
-          @click="dialogVisible = false"
+          @click="editAtlas"
         >确 定</el-button>
       </span>
     </el-dialog>
@@ -107,12 +93,19 @@
 </template>
 
 <script>
+import { getAtlasDetail, upAtlasData } from '@/api/atlas'
+import { startLoading, closeLoading, message } from '@/utils/loading'
+import { changeQuerystringEditAtlas } from '@/utils/function'
+import querystring from 'querystring'
+import editAtlasUpload from '@/components/upload/editAtlasUpload.vue'
 
 export default {
   name: 'EditAtlas',
+  components: {
+    editAtlasUpload
+  },
   data() {
     return {
-      atlasData: {},
       isBatch: false,
       checkList: [],
       atlasList: {},
@@ -122,14 +115,51 @@ export default {
       isRadio: false,
       radioChangePosition: 0,
       dialogVisible: false,
-      fileList: []
+      fileList: {
+        atlasImgs: []
+      },
+      createFromChange: {}
     }
   },
   mounted() {
-    this.atlasList = JSON.parse(this.$route.query.data)
-    // console.log(typeof this.atlasList.imgs)
+    let id = this.Config.UNENCODE(this.$route.query.id)
+    this.getAtlasDetailFun({ id })
   },
   methods: {
+    // 获取图集详情接口
+    getAtlasDetailFun({ id }) {
+      let _this = this
+      startLoading()
+      getAtlasDetail('atlas/getAtlasDetail', { id }).then(res => {
+        closeLoading()
+        if (res.data.data) {
+          _this.atlasList = changeQuerystringEditAtlas(res.data.data)
+          if (Object.keys(_this.atlasList.atlasImgs[0]).length === 0) {
+            _this.atlasList.atlasImgs = []
+          }
+        }
+      }).catch(() => {
+        message('error', '网络出现问题，请稍后重试！')
+      })
+    },
+    // 编辑图集接口
+    upAtlasDataFun(data) {
+      // let _this = this
+      startLoading()
+      upAtlasData('atlas/upAtlasData', data).then(res => {
+        closeLoading()
+        if (res.data.data) {
+          this.$alert('图集编辑成功!', '提示', {
+            confirmButtonText: '确定',
+            callback: action => {
+              this.$router.go(0)
+            }
+          })
+        }
+      }).catch(() => {
+        message('error', '网络出现问题，请稍后重试！')
+      })
+    },
     // 批量管理
     batchEdit() {
       this.isBatch = !this.isBatch
@@ -148,9 +178,9 @@ export default {
         cancelButtonText: '取消',
         type: 'warning'
       }).then(() => {
-        this.atlasList.imgs.unshift(this.atlasList.imgs.splice(this.radioChangePosition, 1)[0])
+        this.atlasList.atlasImgs.unshift(this.atlasList.atlasImgs.splice(this.radioChangePosition, 1)[0])
         this.radio = 0
-        console.log(this.radio)
+        console.log(this.atlasList.atlasImgs)
         this.$message({
           type: 'success',
           message: '成功!'
@@ -182,26 +212,34 @@ export default {
             }
           }
         }
-        for (let i = this.atlasList.imgs.length - 1; i >= 0; i--) {
+        for (let i = this.atlasList.atlasImgs.length - 1; i >= 0; i--) {
           for (let j = 0; j < this.checkList.length; j++) {
-            if (this.atlasList.imgs[i]) {
+            if (this.atlasList.atlasImgs[i]) {
               if (i === this.checkList[j]) {
-                this.atlasList.imgs.splice(i, 1)
+                this.atlasList.atlasImgs.splice(i, 1)
                 continue // 结束当前本轮循环，开始新的一轮循环
               }
             }
           }
         }
-        if (this.atlasList.imgs.length === 0) {
+        if (this.atlasList.atlasImgs.length === 0) {
           this.isBatch = false
         }
         // 取到最后保存下的图片
-        // console.log(this.atlasList.imgs)
+        this.createFromChange = Object.assign({}, this.atlasList)
 
-        this.$message({
-          type: 'success',
-          message: '删除成功!'
-        })
+        let atlasList = []
+        for (let i = 0; i < this.createFromChange.atlasImgs.length; i++) {
+          atlasList.push(querystring.stringify(this.createFromChange.atlasImgs[i]))
+        }
+
+        if (this.createFromChange.atlasImgs.length === 0) {
+          this.createFromChange.atlasImgs = ''
+        } else {
+          this.createFromChange.atlasImgs = "'" + atlasList + "'"
+        }
+
+        this.upAtlasDataFun(this.createFromChange)
       }).catch(() => {
         this.$message({
           type: 'info',
@@ -211,7 +249,7 @@ export default {
     },
     handleCheckAllChange(val) {
       let arr = []
-      for (let i = 0; i < this.atlasList.imgs.length; i++) {
+      for (let i = 0; i < this.atlasList.atlasImgs.length; i++) {
         arr.push(i)
       }
       this.checkList = val ? arr : []
@@ -219,8 +257,8 @@ export default {
     },
     handleCheckedCitiesChange(value) {
       let checkedCount = value.length
-      this.checkAll = checkedCount === this.atlasList.imgs.length
-      this.isIndeterminate = checkedCount > 0 && checkedCount < this.atlasList.imgs.length
+      this.checkAll = checkedCount === this.atlasList.atlasImgs.length
+      this.isIndeterminate = checkedCount > 0 && checkedCount < this.atlasList.atlasImgs.length
     },
     // 单选框切换
     radioChange(i) {
@@ -230,14 +268,47 @@ export default {
     addSwiper() {
       this.dialogVisible = true
     },
-    handleRemove(file, fileList) {
-      console.log(file, fileList)
+    // 接受从子组件传过来的值
+    editAtlasList(req) {
+      this.createFromChange = JSON.parse(JSON.stringify(this.atlasList))
+      for (let i = 0; i < req.length; i++) {
+        this.createFromChange.atlasImgs.push(req[i])
+      }
+      console.log(this.createFromChange)
     },
-    handlePreview(file) {
-      console.log(file)
+    editAtlasListDel(req, file) {
+      for (let i = this.createFromChange.atlasImgs.length - 1; i >= 0; i--) {
+        if (file.uid === this.createFromChange.atlasImgs[i].uid) {
+          this.createFromChange.atlasImgs.splice(i, 1)
+          continue // 结束当前本轮循环，开始新的一轮循环
+        }
+      }
+      console.log(this.createFromChange.atlasImgs)
     },
-    handlescuess(res, file, fileList) {
-      console.log(fileList)
+    // 确定上传图片
+    editAtlas() {
+      this.$confirm(`确定上传 ${this.createFromChange.atlasImgs.length} 张图片?`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+        let atlasList = []
+        for (let i = 0; i < this.createFromChange.atlasImgs.length; i++) {
+          atlasList.push(querystring.stringify(this.createFromChange.atlasImgs[i]))
+        }
+
+        if (this.createFromChange.atlasImgs.length === 0) {
+          message('warning', '请上传图片后再提交！')
+        } else {
+          this.createFromChange.atlasImgs = "'" + atlasList + "'"
+          this.upAtlasDataFun(this.createFromChange)
+        }
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消'
+        })
+      })
     }
   }
 }
@@ -245,7 +316,7 @@ export default {
 
 <style lang="scss" scoped>
 .editAtlas-content {
-margin:50px 0;
+  margin: 50px 0;
   padding: 40px;
   .editAtlas-content-header {
     h1 {

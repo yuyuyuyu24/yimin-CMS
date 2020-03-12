@@ -12,6 +12,8 @@
       <span class="title">清真伊民肉业</span>
 
       <div class="right-menu">
+        欢迎您，{{ username }}
+
         <span
           class="show-pwd"
           @click="logout"
@@ -28,17 +30,26 @@
 import { mapGetters } from 'vuex'
 import Breadcrumb from '@/components/Breadcrumb'
 import Hamburger from '@/components/Hamburger'
+import { getCookie } from '@/utils/function'
 
 export default {
   components: {
     Breadcrumb,
     Hamburger
   },
+  data() {
+    return {
+      username: ''
+    }
+  },
   computed: {
     ...mapGetters([
       'sidebar',
       'avatar'
     ])
+  },
+  mounted() {
+    this.username = getCookie('userName')
   },
   methods: {
     toggleSideBar() {
@@ -111,6 +122,7 @@ export default {
       span {
         font-size: 16px;
         padding-right: 10px;
+        margin-left: 20px;
       }
       .right-menu-item {
         display: inline-block;

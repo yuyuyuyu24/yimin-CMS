@@ -23,25 +23,12 @@
       <el-form-item
         ref="atlasRef"
         label="上传图片:"
-        prop="atlasList"
+        prop="atlasImgs"
       >
-        <el-upload
-          action="https://jsonplaceholder.typicode.com/posts/"
-          :on-preview="atlasHandlePreview"
-          :on-remove="atlasHandleRemove"
-          :on-success="atlasHandleSuccess"
-          :file-list="atlasFrom.atlasList"
-          list-type="picture"
-        >
-          <el-button
-            size="small"
-            type="primary"
-          >点击上传</el-button>
-          <div
-            slot="tip"
-            class="el-upload__tip"
-          >只能上传jpg/png文件。</div>
-        </el-upload>
+        <add-atlas-upload
+          @addAtlasUploadFile="addAtlasList"
+          @addAtlasUploadDel="addAtlasListDel"
+        />
         <p>注：上传的第一张图片默认为封面</p>
       </el-form-item>
       <el-form-item>
@@ -56,40 +43,47 @@
 </template>
 
 <script>
+import addAtlasUpload from '@/components/upload/addAtlasUpload.vue'
+import querystring from 'querystring'
+import { newAtlas } from '@/api/atlas'
+import { startLoading, closeLoading, message } from '@/utils/loading'
 
 export default {
   name: 'AddAtlas',
+  components: {
+    addAtlasUpload
+  },
   data() {
     return {
       atlasFrom: {
-        atlasList: []
+        atlasName: '',
+        atlasImgs: []
       },
       rules: {
         atlasName: [
           { required: true, message: '请填写图集名称!', trigger: 'blur' }
         ],
-        atlasList: [
+        atlasImgs: [
           { required: true, message: '请上传图片！' }
         ]
-      }
+      },
+      createFromChange: {}
     }
   },
   methods: {
-    atlasHandlePreview(file, fileList) {
-      console.log(file, fileList)
-    },
-    atlasHandleRemove(file, fileList) {
-      this.atlasFrom.atlasList = fileList
-    },
-    atlasHandleSuccess(response, file, fileList) {
-      this.atlasFrom.atlasList = fileList
+    // 接受从子组件传过来的值
+    addAtlasList(req) {
+      this.atlasFrom.atlasImgs = req
+      console.log(this.atlasFrom.atlasImgs)
       this.$refs.atlasRef.clearValidate()
+    },
+    addAtlasListDel(req) {
+      this.atlasFrom.atlasImgs = req
     },
     // 提交
     submit(atlasFrom) {
-      let _that = this
       this.$refs[atlasFrom].validate((valid) => {
-        if (this.atlasFrom.atlasList.length > 0) {
+        if (this.atlasFrom.atlasImgs.length > 0) {
           this.$refs.atlasRef.clearValidate()
         }
         if (valid) {
@@ -98,13 +92,13 @@ export default {
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
-            this.$message({
-              type: 'success',
-              message: '提交成功!'
-            })
-            setTimeout(() => {
-              _that.$router.push('/atlas/index')
-            }, 1000)
+            this.createFromChange = Object.assign({}, this.atlasFrom)
+            let atlasImgs = []
+            for (let i = 0; i < this.createFromChange.atlasImgs.length; i++) {
+              atlasImgs.push(querystring.stringify(this.createFromChange.atlasImgs[i]))
+            }
+            this.createFromChange.atlasImgs = "'" + atlasImgs + "'"
+            this.newAtlasFun(this.createFromChange)
           }).catch(() => {
             this.$message({
               type: 'info',
@@ -112,9 +106,25 @@ export default {
             })
           })
         } else {
-          console.log('error submit!!')
           return false
         }
+      })
+    },
+    // 创建图集接口
+    newAtlasFun(data) {
+      startLoading()
+      newAtlas('atlas/newAtlas', data).then(res => {
+        closeLoading()
+        if (res.data.data) {
+          this.$alert('创建图集成功!', '提示', {
+            confirmButtonText: '确定',
+            callback: action => {
+              this.$router.push('/atlas')
+            }
+          })
+        }
+      }).catch(() => {
+        message('error', '网络出现问题，请稍后重试！')
       })
     }
   }

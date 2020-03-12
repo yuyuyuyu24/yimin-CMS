@@ -64,7 +64,7 @@ export default {
         qiniutoken('goods/token').then((res) => {
           if (res.status === 200) {
             // 储存1年
-            setCookie('qiniutoken', res.data.message, 1)
+            setCookie('qiniutoken', res.data.message, 365)
           }
         })
       } else {
@@ -117,7 +117,7 @@ export default {
       const isJPG = file.type === 'image/jpg'
 
       if (!isPNG && !isJPEG && !isJPG) {
-        this.$message.error('上传头像图片只能是 jpg、png、jpeg 格式!')
+        this.$message.error('上传图片只能是 jpg、png、jpeg 格式!')
         return false
       }
     }

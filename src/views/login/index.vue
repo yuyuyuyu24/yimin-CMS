@@ -10,35 +10,35 @@
     >
 
       <div class="title-container">
-        <h3 class="title">Login Form</h3>
+        <h3 class="title">清真伊民肉业后台管理系统</h3>
       </div>
 
-      <el-form-item prop="username">
+      <el-form-item prop="userName">
         <span class="svg-container">
           <svg-icon icon-class="user" />
         </span>
         <el-input
-          ref="username"
-          v-model="loginForm.username"
-          placeholder="Username"
-          name="username"
+          ref="userName"
+          v-model="loginForm.userName"
+          placeholder="请输入用户名"
+          name="userName"
           type="text"
           tabindex="1"
           auto-complete="on"
         />
       </el-form-item>
 
-      <el-form-item prop="password">
+      <el-form-item prop="passWord">
         <span class="svg-container">
           <svg-icon icon-class="password" />
         </span>
         <el-input
-          :key="passwordType"
-          ref="password"
-          v-model="loginForm.password"
-          :type="passwordType"
-          placeholder="Password"
-          name="password"
+          :key="passWordType"
+          ref="passWord"
+          v-model="loginForm.passWord"
+          :type="passWordType"
+          placeholder="请输入密码"
+          name="passWord"
           tabindex="2"
           auto-complete="on"
           @keyup.enter.native="handleLogin"
@@ -47,57 +47,39 @@
           class="show-pwd"
           @click="showPwd"
         >
-          <svg-icon :icon-class="passwordType === 'password' ? 'eye' : 'eye-open'" />
+          <svg-icon :icon-class="passWordType === 'passWord' ? 'eye' : 'eye-open'" />
         </span>
       </el-form-item>
 
       <el-button
         :loading="loading"
         type="primary"
-        style="width:100%;margin-bottom:30px;"
+        style="width:100%;margin-bottom:30px;margin-top:20px;"
         @click.native.prevent="handleLogin"
-      >Login</el-button>
-
-      <div class="tips">
-        <span style="margin-right:20px;">username: admin</span>
-        <span> password: any</span>
-      </div>
-
+      >登录</el-button>
     </el-form>
   </div>
 </template>
 
 <script>
-import { validUsername } from '@/utils/validate'
+import { login } from '@/api/admin'
+import { startLoading, closeLoading, message } from '@/utils/loading'
+import { setCookie } from '@/utils/function'
 
 export default {
   name: 'Login',
   data() {
-    const validateUsername = (rule, value, callback) => {
-      if (!validUsername(value)) {
-        callback(new Error('Please enter the correct user name'))
-      } else {
-        callback()
-      }
-    }
-    const validatePassword = (rule, value, callback) => {
-      if (value.length < 6) {
-        callback(new Error('The password can not be less than 6 digits'))
-      } else {
-        callback()
-      }
-    }
     return {
       loginForm: {
-        username: 'admin',
-        password: '111111'
+        userName: '',
+        passWord: ''
       },
       loginRules: {
-        username: [{ required: true, trigger: 'blur', validator: validateUsername }],
-        password: [{ required: true, trigger: 'blur', validator: validatePassword }]
+        userName: [{ required: true, message: '请填写用户名!', trigger: 'blur' }],
+        passWord: [{ required: true, message: '请填写密码!', trigger: 'blur' }]
       },
       loading: false,
-      passwordType: 'password',
+      passWordType: 'passWord',
       redirect: undefined
     }
   },
@@ -111,29 +93,42 @@ export default {
   },
   methods: {
     showPwd() {
-      if (this.passwordType === 'password') {
-        this.passwordType = ''
+      if (this.passWordType === 'passWord') {
+        this.passWordType = ''
       } else {
-        this.passwordType = 'password'
+        this.passWordType = 'passWord'
       }
       this.$nextTick(() => {
-        this.$refs.password.focus()
+        this.$refs.passWord.focus()
       })
     },
     handleLogin() {
       this.$refs.loginForm.validate(valid => {
         if (valid) {
-          this.loading = true
-          this.$store.dispatch('user/login', this.loginForm).then(() => {
-            this.$router.push({ path: this.redirect || '/' })
-            this.loading = false
-          }).catch(() => {
-            this.loading = false
-          })
+          this.loginFun()
         } else {
           console.log('error submit!!')
           return false
         }
+      })
+    },
+    loginFun() {
+      this.loading = true
+      startLoading()
+      login('admin/login', this.loginForm).then(res => {
+        closeLoading()
+        if (res.data.message) {
+          this.loading = false
+          if (res.data.code === -1) {
+            message('error', res.data.message)
+          } else if (res.data.code === 0) {
+            message('success', res.data.message)
+            setCookie('userName', res.data.data.userName, 7)
+            this.$router.push('/')
+          }
+        }
+      }).catch(() => {
+        message('error', '网络出现问题，请稍后重试！')
       })
     }
   }
@@ -193,6 +188,8 @@ $dark_gray: #889aa4;
 $light_gray: #eee;
 
 .login-container {
+  background: url("../../assets/image/loginbg.png") no-repeat;
+  background-size: 100% 100%;
   min-height: 100%;
   width: 100%;
   background-color: $bg;
@@ -203,7 +200,7 @@ $light_gray: #eee;
     width: 520px;
     max-width: 100%;
     padding: 160px 35px 0;
-    margin: 0 auto;
+    margin: 30px auto;
     overflow: hidden;
   }
 

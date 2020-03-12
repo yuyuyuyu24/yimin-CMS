@@ -1,6 +1,11 @@
 import config from '../utils/common'
 import axios from 'axios'
 
+// 登录接口
+export async function login(api, data) {
+  return axios.post(`${config.api}/${api}`, data)
+}
+
 // 获取admin信息
 export async function getAdminDetail(api, data) {
   return axios.post(`${config.api}/${api}`, data)

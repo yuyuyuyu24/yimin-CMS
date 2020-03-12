@@ -388,6 +388,9 @@ export default {
       } else if (this.createFrom.goodsStock > 0) {
         this.createFrom.goodsStatus = 1
       }
+      if (this.createFrom.videoList.length === 0) {
+        this.createFrom.isVideos = false
+      }
     },
     // 创建商品
     createGoods() {
