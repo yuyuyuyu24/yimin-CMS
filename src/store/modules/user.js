@@ -43,40 +43,28 @@ const actions = {
     })
   },
 
-  // get user info
-  // getInfo({ commit, state }) {
-  //   return new Promise((resolve, reject) => {
-  //     getInfo(state.token).then(response => {
-  //       const { data } = response
-
-  //       if (!data) {
-  //         reject('Verification failed, please Login again.')
-  //       }
-
-  //       const { name, avatar } = data
-
-  //       commit('SET_NAME', name)
-  //       commit('SET_AVATAR', avatar)
-  //       resolve(data)
-  //     }).catch(error => {
-  //       reject(error)
-  //     })
-  //   })
-  // },
-
   // user logout
   logout({ commit, state }) {
     return new Promise((resolve, reject) => {
       logout(state.token).then(() => {
         removeToken() // must remove  token  first
         resetRouter()
-        commit('RESET_STATE')
+        commit('SET_TOKEN', '')
         resolve()
       }).catch(error => {
         reject(error)
       })
     })
   },
+  // logout({ commit, state }) {
+  //   return new Promise((resolve, reject) => {
+  //     commit('SET_TOKEN', '')
+  //     removeToken()
+  //     resetRouter()
+  //     state.name = null// 将用户名去掉，如果不去掉，退出登陆后，再重新登陆的情况下，将不再执行getInfo
+  //     resolve()
+  //   })
+  // },
 
   // remove token
   resetToken({ commit }) {
