@@ -96,9 +96,29 @@
           active-color="#13ce66"
           active-text="是"
           inactive-text="否"
-          @change="isHotFun"
         />
         <p>注：该选项可以不填，默认为否。</p>
+      </el-form-item>
+      <el-form-item label="该商品是否为特价商品:">
+        <el-switch
+          v-model="createFrom.isSpecial"
+          active-color="#13ce66"
+          active-text="是"
+          inactive-text="否"
+        />
+        <p>注：该选项可以不填，默认为否。</p>
+      </el-form-item>
+      <el-form-item
+        v-if="createFrom.isSpecial"
+        label="商品原价:"
+      >
+        <el-input
+          v-model.number="createFrom.beforeGoodsPrice"
+          type="number"
+          min="0"
+          placeholder="请输入商品原价"
+        />
+        <p>注：请输入商品原价，最上面的商品价格为优惠后的价格。</p>
       </el-form-item>
       <el-form-item label="商品库存量:">
         <el-input
@@ -197,6 +217,12 @@
         该商品是否为热门商品:{{ createFrom.isHot===false ?'否':'是' }}
       </span>
       <span>
+        该商品是否为特价商品:{{ createFrom.isSpecial===false ?'否':'是' }}
+      </span>
+      <span v-if="createFrom.isSpecial">
+        商品原价:{{ createFrom.beforeGoodsPrice }}
+      </span>
+      <span>
         商品库存量:{{ createFrom.goodsStock }}
       </span>
       <span>
@@ -234,6 +260,7 @@ export default {
         goodsName: '',
         isVideos: false,
         isHot: false,
+        isSpecial: false,
         coverList: [],
         swiperList: [],
         videoList: [],
@@ -293,6 +320,11 @@ export default {
           } else {
             res.data.data.isHot = true
           }
+          if (res.data.data.isSpecial === 0) {
+            res.data.data.isSpecial = false
+          } else {
+            res.data.data.isSpecial = true
+          }
           if (res.data.data.isVideos === 0) {
             res.data.data.isVideos = false
           } else {
@@ -318,9 +350,6 @@ export default {
     },
     videoList(req) {
       this.createFrom.videoList = req
-    },
-    // 是否为热门商品
-    isHotFun() {
     },
     // 转换商品类型
     changeGoodsType(val) {
@@ -369,28 +398,34 @@ export default {
         if (this.createFrom.swiperList.length > 0) {
           this.$refs.swiperFrom.clearValidate()
         }
+        if (this.createFrom.goodsStock < 0) {
+          return this.$message({
+            message: '商品库存量不能为负数 !',
+            type: 'warning'
+          })
+        }
+        if (this.createFrom.beforeGoodsPrice <= this.createFrom.goodsPrice) {
+          return this.$message({
+            message: '商品原价不能小于或等于商品优惠后的价格 !',
+            type: 'warning'
+          })
+        }
         if (valid) {
           this.centerDialogVisible = true
         } else {
           return false
         }
+        if (this.createFrom.goodsStock === 0) {
+          this.createFrom.goodsStatus = 2
+        } else if (this.createFrom.goodsStock > 0 && this.createFrom.goodsStatus === 3) {
+          this.createFrom.goodsStatus = 3
+        } else if (this.createFrom.goodsStock > 0) {
+          this.createFrom.goodsStatus = 1
+        }
+        if (this.createFrom.videoList.length === 0) {
+          this.createFrom.isVideos = false
+        }
       })
-      if (this.createFrom.goodsStock < 0) {
-        return this.$message({
-          message: '商品库存量不能为负数!',
-          type: 'warning'
-        })
-      }
-      if (this.createFrom.goodsStock === 0) {
-        this.createFrom.goodsStatus = 2
-      } else if (this.createFrom.goodsStock > 0 && this.createFrom.goodsStatus === 3) {
-        this.createFrom.goodsStatus = 3
-      } else if (this.createFrom.goodsStock > 0) {
-        this.createFrom.goodsStatus = 1
-      }
-      if (this.createFrom.videoList.length === 0) {
-        this.createFrom.isVideos = false
-      }
     },
     // 创建商品
     createGoods() {
@@ -400,6 +435,11 @@ export default {
         this.createFromChange.isHot = 0
       } else {
         this.createFromChange.isHot = 1
+      }
+      if (this.createFromChange.isSpecial === false) {
+        this.createFromChange.isSpecial = 0
+      } else {
+        this.createFromChange.isSpecial = 1
       }
       if (this.createFromChange.isVideos === false) {
         this.createFromChange.isVideos = 0
@@ -442,7 +482,7 @@ export default {
 <style lang="scss" >
 .create-content {
   margin: 50px 0;
-  padding: 40px;
+  padding: 20px 40px;
   .create-content-header {
     h1 {
       font-size: 24px;
@@ -455,7 +495,7 @@ export default {
   .create-content-from {
     width: 500px;
     .el-form-item {
-      margin-bottom: 50px;
+      margin-bottom: 20px;
       p {
         white-space: nowrap;
         color: red;

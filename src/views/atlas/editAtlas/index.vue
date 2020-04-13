@@ -317,7 +317,7 @@ export default {
 <style lang="scss" scoped>
 .editAtlas-content {
   margin: 50px 0;
-  padding: 40px;
+  padding: 20px 40px;
   .editAtlas-content-header {
     h1 {
       font-size: 24px;
@@ -325,7 +325,7 @@ export default {
     }
     display: flex;
     align-items: center;
-    margin-bottom: 50px;
+    margin-bottom: 20px;
   }
   .editAtlas-card-body-checkbox {
     margin: 30px 0;

@@ -134,7 +134,7 @@ export default {
 <style lang="scss" scoped>
 .addAtlas-content {
   margin: 50px 0;
-  padding: 40px;
+  padding: 20px 40px;
   .addAtlas-content-header {
     h1 {
       font-size: 24px;
@@ -142,12 +142,12 @@ export default {
     }
     display: flex;
     align-items: center;
-    margin-bottom: 50px;
+    margin-bottom: 20px;
   }
   .create-content-from {
     width: 500px;
     .el-form-item {
-      margin-bottom: 50px;
+      margin-bottom: 20px;
       p {
         white-space: nowrap;
         color: red;

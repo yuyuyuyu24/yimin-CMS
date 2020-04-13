@@ -1,7 +1,7 @@
 export default {
-  api: 'http://localhost:3000/api',
+  api: 'http://api.ymry.xyz/api',
   // 这是七牛云空间的外链默认域名
-  QI_NIU_UPLOAD: 'http://q726c1akb.bkt.clouddn.com',
+  QI_NIU_UPLOAD: 'http://www.ymry.xyz',
   // 七牛云的上传地址，根据自己所在地区选择，我这里是华南区
   QI_NIU_DIMAIN: 'https://up-z1.qiniup.com',
   // 公告状态
@@ -63,6 +63,70 @@ export default {
       arr[this.GOODS_STATUS_NROMAL] = '正常'
       arr[this.GOODS_STATUS_SOLDOUT] = '已售罄'
       arr[this.GOODS_STATUS_LOWERSHELF] = '已下架'
+      if (val && arr[val]) {
+        return arr[val]
+      } else {
+        return arr
+      }
+    }
+  },
+  // 配送方式
+  DELIVERY_TYPE: {
+    DELIVERY_TYPE_DELIVERY: 'delivery',
+    DELIVERY_TYPE_SELF: 'self',
+    DELIVERY_TYPE_FUN: function(val) {
+      const arr = {}
+      arr[this.DELIVERY_TYPE_DELIVERY] = '配送'
+      arr[this.DELIVERY_TYPE_SELF] = '自提'
+      if (val && arr[val]) {
+        return arr[val]
+      } else {
+        return arr
+      }
+    }
+  },
+  //  订单状态
+  ORDER_STATUS: {
+    ORDER_STATUS_DZF: '1',
+    ORDER_STATUS_YZFDFH: '2',
+    ORDER_STATUS_YWC: '3',
+    ORDER_STATUS_YGB: '4',
+    ORDER_STATUS_FUN: function(val) {
+      const arr = {}
+      arr[this.ORDER_STATUS_DZF] = '待支付'
+      arr[this.ORDER_STATUS_YZFDFH] = '已支付待发货'
+      arr[this.ORDER_STATUS_YWC] = '已完成'
+      arr[this.ORDER_STATUS_YGB] = '已关闭'
+      if (val && arr[val]) {
+        return arr[val]
+      } else {
+        return arr
+      }
+    }
+  },
+  //  用户状态
+  USER_STATUS: {
+    USER_STATUS_ZC: '1',
+    USER_STATUS_JY: '2',
+    USER_STATUS_FUN: function(val) {
+      const arr = {}
+      arr[this.USER_STATUS_ZC] = '正常'
+      arr[this.USER_STATUS_JY] = '禁用'
+      if (val && arr[val]) {
+        return arr[val]
+      } else {
+        return arr
+      }
+    }
+  },
+  //  评论状态
+  COMMENT_STATUS: {
+    COMMENT_STATUS_ZC: '1',
+    COMMENT_STATUS_SC: '2',
+    COMMENT_STATUS_FUN: function(val) {
+      const arr = {}
+      arr[this.COMMENT_STATUS_ZC] = '正常'
+      arr[this.COMMENT_STATUS_SC] = '已删除'
       if (val && arr[val]) {
         return arr[val]
       } else {

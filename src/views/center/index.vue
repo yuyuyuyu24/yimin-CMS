@@ -376,7 +376,7 @@ export default {
 .center {
   &-content {
     margin: 50px 0;
-    padding: 40px;
+    padding: 20px 40px;
   }
   &-content-header {
     h1 {
@@ -389,7 +389,7 @@ export default {
   }
   &-content-from {
     width: 700px;
-    margin-bottom: 50px;
+    margin-bottom: 20px;
     display: flex;
     justify-content: space-between;
     >>> .el-textarea__inner,

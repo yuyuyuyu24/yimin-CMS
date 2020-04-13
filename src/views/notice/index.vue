@@ -353,7 +353,8 @@ export default {
     // 确定发布
     submit(form) {
       const _this = this
-      this.$refs[form].validate(async(valid) => {
+      // eslint-disable-next-line space-before-function-paren
+      this.$refs[form].validate(async (valid) => {
         if (!valid) return false
       })
       this.$confirm('是否发布更改后的公告？', '确认信息', {
@@ -402,7 +403,7 @@ export default {
 <style lang="scss" scoped>
 .notice-content {
   margin: 50px 0;
-  padding: 40px;
+  padding: 20px 40px;
   .notice-content-header {
     h1 {
       font-size: 24px;
@@ -410,7 +411,7 @@ export default {
     }
     display: flex;
     align-items: center;
-    margin-bottom: 50px;
+    margin-bottom: 20px;
   }
   .form-btn__danger {
     margin-top: 20px;

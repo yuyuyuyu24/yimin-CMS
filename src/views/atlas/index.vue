@@ -133,7 +133,7 @@ export default {
 <style lang="scss" scoped>
 .atlas-content {
   margin: 50px 0;
-  padding: 40px;
+  padding: 20px 40px;
   .atlas-content-header {
     h1 {
       font-size: 24px;
@@ -141,7 +141,7 @@ export default {
     }
     display: flex;
     align-items: center;
-    margin-bottom: 50px;
+    margin-bottom: 20px;
   }
   .el-table {
     width: 100%;
