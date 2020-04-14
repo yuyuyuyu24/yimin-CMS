@@ -404,7 +404,7 @@ export default {
             type: 'warning'
           })
         }
-        if (this.createFrom.beforeGoodsPrice <= this.createFrom.goodsPrice) {
+        if (this.createFrom.isSpecial && this.createFrom.beforeGoodsPrice <= this.createFrom.goodsPrice) {
           return this.$message({
             message: '商品原价不能小于或等于商品优惠后的价格 !',
             type: 'warning'
