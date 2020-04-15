@@ -67,6 +67,17 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item label="订单日期:">
+          <el-date-picker
+            v-model="time"
+            type="datetimerange"
+            range-separator="至"
+            start-placeholder="开始日期"
+            end-placeholder="结束日期"
+            value-format="timestamp"
+            @change="seleteTime"
+          />
+        </el-form-item>
         <el-form-item>
           <el-button
             class="form-btn__defalut"
@@ -223,7 +234,9 @@ export default {
         deliveryMthods: '',
         orderStatus: '',
         pageSize: 10,
-        pageNumber: 1
+        pageNumber: 1,
+        startTime: '',
+        endTime: ''
       },
       tableData: [],
       currentPage: 1,
@@ -231,7 +244,8 @@ export default {
       tableDataType: '',
       dialogVisible: false,
       goodsData: [],
-      intervalId: null
+      intervalId: null,
+      time: ''
     }
   },
   mounted() {
@@ -281,6 +295,7 @@ export default {
     // 查询
     searchUser(searchFrom) {
       this.tableDataType = 'search'
+      console.log(searchFrom)
       // 根据条件查询商品
       this.queryGoodsFun(searchFrom)
     },
@@ -402,6 +417,16 @@ export default {
       var mm = (date.getMinutes() < 10 ? '0' + date.getMinutes() : date.getMinutes()) + ':'
       var ss = (date.getSeconds() < 10 ? '0' + date.getSeconds() : date.getSeconds())
       return YY + MM + DD + ' ' + hh + mm + ss
+    },
+    // 把选中的时间范围传给查询表单
+    seleteTime(e) {
+      if (e != null) {
+        this.searchFrom.startTime = e[0]
+        this.searchFrom.endTime = e[1]
+      } else {
+        this.searchFrom.startTime = ''
+        this.searchFrom.endTime = ''
+      }
     }
   }
 
