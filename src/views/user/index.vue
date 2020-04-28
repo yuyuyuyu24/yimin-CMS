@@ -167,9 +167,7 @@ export default {
         if (res.data.data) {
           _this.tableData = res.data.data
         }
-      }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
-      })
+      }).catch(() => { })
     },
     // 查询
     searchUser(searchFrom) {
@@ -186,9 +184,7 @@ export default {
         if (res.data.data) {
           _this.tableData = res.data.data
         }
-      }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
-      })
+      }).catch(() => { })
     },
     // 分页事件
     handleCurrentChange(e) {
@@ -251,9 +247,7 @@ export default {
           message('success', '修改成功!')
           _this.pageGetUserFun(_this.currentPage)
         }
-      }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
-      })
+      }).catch(() => { })
     },
     // 转换用户状态
     changeUserStatus(val) {
@@ -278,8 +272,8 @@ export default {
     margin-bottom: 20px;
   }
   .userImg {
-    width: 100px;
-    height: 100px;
+    width: 60px;
+    height: 60px;
   }
 }
 </style>

@@ -59,13 +59,13 @@ export default {
     },
     // 获取上传进度
     progress(res) { },
-    upload(req) {
+    async upload(req) {
       const formdata = new FormData()
       this.uploadData.key = `upload_pic_${new Date().getTime()}_${req.file.name}`
       formdata.append('file', req.file)
       formdata.append('token', this.uploadData.token)
       formdata.append('key', this.uploadData.key)
-      qiniuUpload(this.Config.QI_NIU_DIMAIN, formdata, this.progress).then((res) => {
+      qiniuUpload(this.Config.QI_NIU_DIMAIN, formdata, this.progress).then(res => {
         this.imageUrl = this.Config.QI_NIU_UPLOAD + '/' + res.data.key
         let file = {
           name: req.file.name,
@@ -108,7 +108,6 @@ export default {
       }
     },
     exceed() {
-      console.log('121212')
       message('warning', '轮播图一次只能上传一张！')
     }
   }

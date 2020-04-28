@@ -252,9 +252,7 @@ export default {
         if (res.data.data) {
           _this.tableData = res.data.data
         }
-      }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
-      })
+      }).catch(() => { })
     },
     // 使用公告
     useNotice(scope) {
@@ -284,9 +282,7 @@ export default {
               message('info', '取消')
             })
         }
-      }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
-      })
+      }).catch(() => { })
     },
     // 停用公告
     stopNotice(scope) {
@@ -316,9 +312,7 @@ export default {
               message('info', '取消')
             })
         }
-      }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
-      })
+      }).catch(() => { })
     },
     handleCurrentChange() { },
     // 创建公告
@@ -384,9 +378,7 @@ export default {
           _this.dialogVisible = false
           _this.getNoticeFun()
         }
-      }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
-      })
+      }).catch(() => { })
     },
     // 转换公告状态
     changeNoticeStatus(val) {

@@ -46,7 +46,7 @@
 import addAtlasUpload from '@/components/upload/addAtlasUpload.vue'
 import querystring from 'querystring'
 import { newAtlas } from '@/api/atlas'
-import { startLoading, closeLoading, message } from '@/utils/loading'
+import { startLoading, closeLoading } from '@/utils/loading'
 
 export default {
   name: 'AddAtlas',
@@ -74,7 +74,6 @@ export default {
     // 接受从子组件传过来的值
     addAtlasList(req) {
       this.atlasFrom.atlasImgs = req
-      console.log(this.atlasFrom.atlasImgs)
       this.$refs.atlasRef.clearValidate()
     },
     addAtlasListDel(req) {
@@ -123,9 +122,7 @@ export default {
             }
           })
         }
-      }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
-      })
+      }).catch(() => { })
     }
   }
 }

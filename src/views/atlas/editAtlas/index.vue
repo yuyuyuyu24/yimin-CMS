@@ -138,9 +138,7 @@ export default {
             _this.atlasList.atlasImgs = []
           }
         }
-      }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
-      })
+      }).catch(() => { })
     },
     // 编辑图集接口
     upAtlasDataFun(data) {
@@ -156,9 +154,7 @@ export default {
             }
           })
         }
-      }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
-      })
+      }).catch(() => { })
     },
     // 批量管理
     batchEdit() {
@@ -180,7 +176,6 @@ export default {
       }).then(() => {
         this.atlasList.atlasImgs.unshift(this.atlasList.atlasImgs.splice(this.radioChangePosition, 1)[0])
         this.radio = 0
-        console.log(this.atlasList.atlasImgs)
         this.$message({
           type: 'success',
           message: '成功!'
@@ -274,7 +269,6 @@ export default {
       for (let i = 0; i < req.length; i++) {
         this.createFromChange.atlasImgs.push(req[i])
       }
-      console.log(this.createFromChange)
     },
     editAtlasListDel(req, file) {
       for (let i = this.createFromChange.atlasImgs.length - 1; i >= 0; i--) {
@@ -283,7 +277,6 @@ export default {
           continue // 结束当前本轮循环，开始新的一轮循环
         }
       }
-      console.log(this.createFromChange.atlasImgs)
     },
     // 确定上传图片
     editAtlas() {

@@ -288,14 +288,11 @@ export default {
           }
           _this.tableData = res.data.data
         }
-      }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
-      })
+      }).catch(() => { })
     },
     // 查询
     searchUser(searchFrom) {
       this.tableDataType = 'search'
-      console.log(searchFrom)
       // 根据条件查询商品
       this.queryGoodsFun(searchFrom)
     },
@@ -308,9 +305,7 @@ export default {
         if (res.data.data) {
           _this.tableData = res.data.data
         }
-      }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
-      })
+      }).catch(() => { })
     },
     // 分页事件
     handleCurrentChange(e) {
@@ -343,9 +338,7 @@ export default {
           _this.goodsData = res.data.data
           _this.dialogVisible = true
         }
-      }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
-      })
+      }).catch(() => { })
     },
     // 发货按钮
     deliver(scope) {
@@ -376,11 +369,8 @@ export default {
         if (res.data.data) {
           message('success', '修改成功!')
           _this.pageGetOrderFun(_this.currentPage)
-          console.log(_this.currentPage)
         }
-      }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
-      })
+      }).catch(() => { })
     },
     // 定时刷新数据函数
     dataRefreh() {

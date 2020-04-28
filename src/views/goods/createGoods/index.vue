@@ -241,7 +241,7 @@
 
 <script>
 import { getGoodsDetail, newGoods, upGoodsData } from '@/api/goods'
-import { startLoading, closeLoading, message } from '@/utils/loading'
+import { startLoading, closeLoading } from '@/utils/loading'
 import coverUpload from '@/components/upload/coverUpload.vue'
 import swiperUpload from '@/components/upload/swiperUpload.vue'
 import videoUpload from '@/components/upload/videoUpload.vue'
@@ -332,9 +332,7 @@ export default {
           }
           _this.createFrom = changeQuerystringDetail(res.data.data)
         }
-      }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
-      })
+      }).catch(() => { })
     },
     // 接受从子组件传过来的cover值
     coverList(req) {
@@ -368,9 +366,7 @@ export default {
             }
           })
         }
-      }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
-      })
+      }).catch(() => { })
     },
     // 编辑商品接口
     upGoodsDataFun(data) {
@@ -385,9 +381,7 @@ export default {
             }
           })
         }
-      }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
-      })
+      }).catch(() => { })
     },
     // 提交表单
     submit(createFrom) {

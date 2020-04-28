@@ -69,7 +69,7 @@
 
 <script>
 import { getAtlas } from '@/api/atlas'
-import { startLoading, closeLoading, message } from '@/utils/loading'
+import { startLoading, closeLoading } from '@/utils/loading'
 import querystring from 'querystring'
 
 export default {
@@ -80,7 +80,6 @@ export default {
     }
   },
   mounted() {
-    // console.log(this.$store)
     this.getSwiperFun()
   },
   methods: {
@@ -100,12 +99,9 @@ export default {
             }
             res.data.data[i].atlasImgs = atlasImgs
             this.atlasData = res.data.data
-            console.log(this.atlasData[i].atlasImgs[0].url)
           }
         }
-      }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
-      })
+      }).catch(() => { })
     },
     // 增加图集
     addAtlas() {

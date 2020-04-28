@@ -61,7 +61,6 @@ export default {
     // 请求七牛云token
     qiniutokenFun() {
       if (getCookie('qiniutoken') === null) {
-        console.log('12121')
         qiniutoken('goods/token').then((res) => {
           if (res.status === 200) {
             // 储存1年
@@ -90,7 +89,6 @@ export default {
           url: this.imageUrl
         }
         this.fileList.push(file)
-        console.log(this.fileList)
         this.$emit('headFile', this.fileList)
       })
     },

@@ -124,9 +124,7 @@ export default {
             this.srcList.push(_this.swiperData[i].url)
           }
         }
-      }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
-      })
+      }).catch(() => { })
     },
     // 增加轮播图
     addSwiper() {
@@ -151,9 +149,7 @@ export default {
                 }
               })
             }
-          }).catch(() => {
-            message('error', '网络出现问题，请稍后重试！')
-          })
+          }).catch(() => { })
         })
         .catch(action => {
           message('info', '取消删除！')
@@ -190,9 +186,7 @@ export default {
                     }
                   })
                 }
-              }).catch(() => {
-                message('error', '网络出现问题，请稍后重试！')
-              })
+              }).catch(() => { })
             })
             .catch(action => {
               message('info', '取消！')

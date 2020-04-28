@@ -193,7 +193,6 @@ export default {
           _this.tableDataLength = res.data.data.length
         }
       }).catch(() => {
-        message('error', '服务器出现问题，请稍后重试！')
       })
     },
     // 分页获取全部商品
@@ -211,7 +210,6 @@ export default {
           _this.tableData = changeQuerystring(res.data.data)
         }
       }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
       })
     },
     // 增加商品
@@ -238,7 +236,6 @@ export default {
           _this.tableData = changeQuerystring(res.data.data)
         }
       }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
       })
     },
     // 分页事件
@@ -334,8 +331,6 @@ export default {
               })
               this.pageGetGoodsFun()
             }
-          }).catch(() => {
-            message('error', '网络出现问题，请稍后重试！')
           })
         })
         .catch(action => {

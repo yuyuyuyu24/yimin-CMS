@@ -126,12 +126,36 @@
         >提交</el-button>
       </el-form-item>
     </el-form>
+    <el-form
+      :inline="true"
+      :model="businessFrom"
+      label-width="150px"
+      class="center-content-from"
+    >
+      <el-form-item
+        label="是否营业:"
+        prop=""
+      >
+        <el-switch
+          v-model="businessFrom.business"
+          active-text="营业中"
+          inactive-text="暂停营业"
+        />
+      </el-form-item>
+      <el-form-item>
+        <el-button
+          size="small"
+          plain
+          @click="businessFun"
+        >提交</el-button>
+      </el-form-item>
+    </el-form>
 
   </div>
 </template>
 
 <script>
-import { getAdminDetail, editAdminHead, editAdminBg, editAdminWord, editAdminPhoneOne, editAdminPhoneTwo } from '@/api/admin'
+import { getAdminDetail, editAdminHead, editAdminBg, editAdminWord, editAdminPhoneOne, editAdminPhoneTwo, changeBusiness } from '@/api/admin'
 import { startLoading, closeLoading, message } from '@/utils/loading'
 import headUpload from '@/components/upload/headUpload.vue'
 import bgImgUpload from '@/components/upload/bgImgUpload.vue'
@@ -159,6 +183,9 @@ export default {
       },
       editPhoneTwoFrom: {
         'phoneTwo': ''
+      },
+      businessFrom: {
+        'business': true
       },
       changeHeadImgFrom: {},
       changeBgImgFrom: {}
@@ -194,6 +221,11 @@ export default {
           _this.shopReadmeFrom.textarea = res.data.data.shopWord
           _this.editPhoneOneFrom.phoneOne = res.data.data.phoneOne
           _this.editPhoneTwoFrom.phoneTwo = res.data.data.phoneTwo
+          if (res.data.data.business === '1') {
+            _this.businessFrom.business = true
+          } else {
+            _this.businessFrom.business = false
+          }
         }
       })
     },
@@ -226,9 +258,7 @@ export default {
                 }
               })
             }
-          }).catch(() => {
-            message('error', '网络出现问题，请稍后重试！')
-          })
+          }).catch(() => { })
         })
         .catch(action => {
           message('info', '取消！')
@@ -263,9 +293,7 @@ export default {
                 }
               })
             }
-          }).catch(() => {
-            message('error', '网络出现问题，请稍后重试！')
-          })
+          }).catch(() => { })
         })
         .catch(action => {
           message('info', '取消！')
@@ -290,9 +318,7 @@ export default {
               message('success', '修改成功！')
               this.getAdminDetailFun()
             }
-          }).catch(() => {
-            message('error', '网络出现问题，请稍后重试！')
-          })
+          }).catch(() => { })
         })
         .catch(action => {
           message('info', '取消！')
@@ -318,9 +344,7 @@ export default {
               message('success', '修改成功！')
               this.getAdminDetailFun()
             }
-          }).catch(() => {
-            message('error', '网络出现问题，请稍后重试！')
-          })
+          }).catch(() => { })
         })
         .catch(action => {
           message('info', '取消！')
@@ -346,13 +370,61 @@ export default {
               message('success', '修改成功！')
               this.getAdminDetailFun()
             }
-          }).catch(() => {
-            message('error', '网络出现问题，请稍后重试！')
-          })
+          }).catch(() => { })
         })
         .catch(action => {
           message('info', '取消！')
         })
+    },
+    // 是否营业
+    businessFun() {
+      if (this.businessFrom.business === true) {
+        this.$confirm('是否开始营业?', '确认信息', {
+          distinguishCancelAndClose: true,
+          confirmButtonText: '确认',
+          cancelButtonText: '取消'
+        })
+          .then(() => {
+            startLoading()
+            let data = {
+              id: 1,
+              business: '1'
+            }
+            changeBusiness('admin/changeBusiness', data).then(res => {
+              closeLoading()
+              if (res.data) {
+                message('success', '修改成功！')
+                this.getAdminDetailFun()
+              }
+            }).catch(() => { })
+          })
+          .catch(action => {
+            message('info', '取消！')
+          })
+      } else {
+        this.$confirm('是否暂停营业?', '确认信息', {
+          distinguishCancelAndClose: true,
+          confirmButtonText: '确认',
+          cancelButtonText: '取消'
+        })
+          .then(() => {
+            startLoading()
+            let data = {
+              id: 1,
+              business: '2'
+            }
+            changeBusiness('admin/changeBusiness', data).then(res => {
+              closeLoading()
+              if (res.data) {
+                message('success', '修改成功！')
+                this.getAdminDetailFun()
+              }
+            }).catch(() => { })
+          })
+          .catch(action => {
+            message('info', '取消！')
+          })
+      }
     },
     // 接受从子组件传过来的head值
     headList(req) {

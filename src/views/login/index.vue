@@ -107,7 +107,6 @@ export default {
         if (valid) {
           this.loginFun()
         } else {
-          console.log('error submit!!')
           return false
         }
       })
@@ -124,12 +123,11 @@ export default {
           } else if (res.data.code === 0) {
             message('success', res.data.message)
             setCookie('userName', res.data.data.userName, 7)
+            setCookie('token', res.data.data.token, 7)
             this.$router.push('/')
           }
         }
-      }).catch(() => {
-        message('error', '网络出现问题，请稍后重试！')
-      })
+      }).catch(() => { })
     }
   }
 }
@@ -188,7 +186,7 @@ $dark_gray: #889aa4;
 $light_gray: #eee;
 
 .login-container {
-  background: url("../../assets/image/loginbg.png") no-repeat;
+  background: url('../../assets/image/loginbg.png') no-repeat;
   background-size: 100% 100%;
   min-height: 100%;
   width: 100%;
