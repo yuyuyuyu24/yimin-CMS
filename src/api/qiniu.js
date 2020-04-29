@@ -10,6 +10,7 @@ export async function qiniutoken(api, data) {
 export async function qiniuUpload(api, data, callback) {
   return post(api, data, {
     onUploadProgress: progressEvent => {
+      console.log('12121212')
       let complete = progressEvent.loaded / progressEvent.total * 100 | 0
       callback(complete)
     }

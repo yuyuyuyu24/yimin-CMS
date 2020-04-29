@@ -36,8 +36,9 @@ axios.interceptors.response.use((response) => {
     return Promise.resolve(response)
   } else if (response.data.code === -1) {
     message('error', response.data.message)
+  } else {
+    return Promise.resolve(response)
   }
-  return Promise.resolve(response)
 }, function(error) {
   return Promise.reject(error)
 })
@@ -57,9 +58,9 @@ export function get(url, params) {
   })
 }
 
-export function post(url, params) {
+export function post(url, params, config = {}) {
   return new Promise((resolve, reject) => {
-    axios.post(url, params)
+    axios.post(url, params, config)
       .then(res => {
         resolve(res)
       })
