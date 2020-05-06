@@ -52,6 +52,24 @@
             />
           </el-select>
         </el-form-item>
+        <el-form-item label="商品状态:">
+          <el-select
+            v-model="searchFrom.goodsStatus"
+            filterable
+            placeholder="请选择"
+          >
+            <el-option
+              label="全部"
+              value=""
+            />
+            <el-option
+              v-for="(v, k, i) in Config.GOODS_STATUS.GOODS_STATUS_FUN()"
+              :key="i"
+              :label="v"
+              :value="k"
+            />
+          </el-select>
+        </el-form-item>
         <el-form-item>
           <el-button
             class="form-btn__defalut"
@@ -162,6 +180,7 @@ export default {
         goodsName: '',
         goodsPrice: '',
         goodsType: '',
+        goodsStatus: '',
         pageSize: 10,
         pageNumber: 1
       },
