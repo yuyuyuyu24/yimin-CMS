@@ -5,55 +5,26 @@
     </div>
     <el-form
       ref="createFrom"
-      label-width="160px"
+      label-width="180px"
       label-position="left"
       class="create-content-from"
       :model="createFrom"
       :rules="rules"
     >
-      <el-form-item
-        label="商品名称:"
-        prop="goodsName"
-      >
-        <el-input
-          v-model="createFrom.goodsName"
-          placeholder="请输入商品名称"
-        />
+      <el-form-item label="商品名称:" prop="goodsName">
+        <el-input v-model="createFrom.goodsName" placeholder="请输入商品名称" />
       </el-form-item>
-      <el-form-item
-        label="商品价格:"
-        prop="goodsPrice"
-      >
-        <el-input
-          v-model.number="createFrom.goodsPrice"
-          type="number"
-          placeholder="请输入商品价格"
-        />
+      <el-form-item label="商品价格:" prop="goodsPrice">
+        <el-input v-model.number="createFrom.goodsPrice" type="number" placeholder="请输入商品价格" />
       </el-form-item>
-      <el-form-item
-        label="商品留言:"
-        prop="goodsInfo"
-      >
-        <el-input
-          v-model="createFrom.goodsInfo"
-          placeholder="请输入商品留言"
-        />
+      <el-form-item label="商品留言:" prop="goodsInfo">
+        <el-input v-model="createFrom.goodsInfo" placeholder="请输入商品留言" />
       </el-form-item>
-      <el-form-item
-        label="商品单位:"
-        prop="goodsUnit"
-      >
-        <el-input
-          v-model="createFrom.goodsUnit"
-          placeholder="请输入商品单位"
-        />
+      <el-form-item label="商品单位:" prop="goodsUnit">
+        <el-input v-model="createFrom.goodsUnit" placeholder="请输入商品单位" />
         <p>例：500克，袋，个，盒等。</p>
       </el-form-item>
-      <el-form-item
-        ref="coverFrom"
-        label="商品封面:"
-        prop="coverList"
-      >
+      <el-form-item ref="coverFrom" label="商品封面1:" prop="coverList">
         <cover-upload
           :coverlist="createFrom.coverList"
           @coverFile="coverList"
@@ -61,15 +32,8 @@
         />
         <p>注：建议把商品封面当做轮播图的第一张图，所以需要在商品轮播图处重新上传一次商品封面图片。</p>
       </el-form-item>
-      <el-form-item
-        ref="swiperFrom"
-        label="商品轮播图:"
-        prop="swiperList"
-      >
-        <swiper-upload
-          :swiperlist="createFrom.swiperList"
-          @swiperFile="swiperList"
-        />
+      <el-form-item ref="swiperFrom" label="商品轮播图:" prop="swiperList">
+        <swiper-upload :swiperlist="createFrom.swiperList" @swiperFile="swiperList" />
         <p>注：轮播图按顺序上传，第一张上传的图片即为第一张轮播图，以此类推。</p>
       </el-form-item>
       <el-form-item label="是否有商品视频:">
@@ -81,14 +45,8 @@
         />
         <p>注：该选项可以不填，默认为否。</p>
       </el-form-item>
-      <el-form-item
-        v-show="createFrom.isVideos"
-        label="商品视频:"
-      >
-        <video-upload
-          :videolist="createFrom.videoList"
-          @videoFile="videoList"
-        />
+      <el-form-item v-show="createFrom.isVideos" label="商品视频:">
+        <video-upload :videolist="createFrom.videoList" @videoFile="videoList" />
       </el-form-item>
       <el-form-item label="该商品是否为热门商品:">
         <el-switch
@@ -108,10 +66,16 @@
         />
         <p>注：该选项可以不填，默认为否。</p>
       </el-form-item>
-      <el-form-item
-        v-if="createFrom.isSpecial"
-        label="商品原价:"
-      >
+      <el-form-item label="该商品是否为非定量商品:">
+        <el-switch
+          v-model="createFrom.isFixed"
+          active-color="#13ce66"
+          active-text="是"
+          inactive-text="否"
+        />
+        <p>注：该选项可以不填，默认为否。</p>
+      </el-form-item>
+      <el-form-item v-if="createFrom.isSpecial" label="商品原价:">
         <el-input
           v-model.number="createFrom.beforeGoodsPrice"
           type="number"
@@ -129,15 +93,8 @@
         />
         <p>注：商品库存量可以不填，默认库存数量为99，当库存量为 0 时商品会显示已售罄。</p>
       </el-form-item>
-      <el-form-item
-        label="商品分类:"
-        prop="goodsType"
-      >
-        <el-select
-          v-model="createFrom.goodsType"
-          filterable
-          placeholder="请选择"
-        >
+      <el-form-item label="商品分类:" prop="goodsType">
+        <el-select v-model="createFrom.goodsType" filterable placeholder="请选择">
           <el-option
             v-for="(v, k, i) in Config.MEAT_TYPE.MEAT_TYPE_STATUS()"
             :key="i"
@@ -147,10 +104,7 @@
         </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button
-          type="primary"
-          @click="submit('createFrom')"
-        >提交</el-button>
+        <el-button type="primary" @click="submit('createFrom')">提交</el-button>
       </el-form-item>
     </el-form>
     <el-dialog
@@ -160,52 +114,30 @@
       :before-close="handleClose"
     >
       <p>请检查商品信息，确认无误后点击确定即可发布商品！</p>
-      <span>
-        商品名称:{{ createFrom.goodsName }}
-      </span>
-      <span>
-        商品价格:{{ createFrom.goodsPrice }}
-      </span>
-      <span>
-        商品留言:{{ createFrom.goodsInfo }}
-      </span>
-      <span>
-        商品单位:{{ createFrom.goodsUnit }}
-      </span>
+      <span>商品名称:{{ createFrom.goodsName }}</span>
+      <span>商品价格:{{ createFrom.goodsPrice }}</span>
+      <span>商品留言:{{ createFrom.goodsInfo }}</span>
+      <span>商品单位:{{ createFrom.goodsUnit }}</span>
       <span>
         商品封面:
-        <br>
+        <br />
         <div class="upload-img">
-          <img
-            v-for="(item,index) in createFrom.coverList"
-            :key="index"
-            :src="item.url"
-          >
+          <img v-for="(item,index) in createFrom.coverList" :key="index" :src="item.url" />
         </div>
       </span>
       <span>
         商品轮播图:
-        <br>
+        <br />
         <div class="upload-img">
-          <img
-            v-for="(item,index) in createFrom.swiperList"
-            :key="index"
-            :src="item.url"
-          >
+          <img v-for="(item,index) in createFrom.swiperList" :key="index" :src="item.url" />
         </div>
       </span>
-      <span>
-        是否有商品视频:{{ createFrom.isVideos===false ?'否':'是' }}
-      </span>
+      <span>是否有商品视频:{{ createFrom.isVideos===false ?'否':'是' }}</span>
       <span v-if="createFrom.isVideos">
         商品视频:
-        <br>
+        <br />
         <div class="goods-video">
-          <div
-            v-for="(item,index) in createFrom.videoList"
-            :key="index"
-            class="goods-video-box"
-          >
+          <div v-for="(item,index) in createFrom.videoList" :key="index" class="goods-video-box">
             <span class="svg-container">
               <svg-icon icon-class="video" />
             </span>
@@ -213,27 +145,15 @@
           </div>
         </div>
       </span>
-      <span>
-        该商品是否为热门商品:{{ createFrom.isHot===false ?'否':'是' }}
-      </span>
-      <span>
-        该商品是否为特价商品:{{ createFrom.isSpecial===false ?'否':'是' }}
-      </span>
-      <span v-if="createFrom.isSpecial">
-        商品原价:{{ createFrom.beforeGoodsPrice }}
-      </span>
-      <span>
-        商品库存量:{{ createFrom.goodsStock }}
-      </span>
-      <span>
-        商品分类:{{ changeGoodsType(createFrom.goodsType) }}
-      </span>
+      <span>该商品是否为热门商品:{{ createFrom.isHot===false ?'否':'是' }}</span>
+      <span>该商品是否为特价商品:{{ createFrom.isSpecial===false ?'否':'是' }}</span>
+      <span>该商品是否为非定量商品:{{ createFrom.isFixed===false ?'否':'是' }}</span>
+      <span v-if="createFrom.isSpecial">商品原价:{{ createFrom.beforeGoodsPrice }}</span>
+      <span>商品库存量:{{ createFrom.goodsStock }}</span>
+      <span>商品分类:{{ changeGoodsType(createFrom.goodsType) }}</span>
       <span slot="footer">
         <el-button @click="handleClose">取 消</el-button>
-        <el-button
-          type="primary"
-          @click="createGoods"
-        >确 定</el-button>
+        <el-button type="primary" @click="createGoods">确 定</el-button>
       </span>
     </el-dialog>
   </div>
@@ -254,13 +174,14 @@ export default {
     swiperUpload,
     videoUpload
   },
-  data() {
+  data () {
     return {
       createFrom: {
         goodsName: '',
         isVideos: false,
         isHot: false,
         isSpecial: false,
+        isFixed: false,
         coverList: [],
         swiperList: [],
         videoList: [],
@@ -298,7 +219,7 @@ export default {
       pageType: ''
     }
   },
-  mounted() {
+  mounted () {
     if (this.$route.query.type === 'edit') {
       let id = this.Config.UNENCODE(this.$route.query.id)
       this.getGoodsFun({ id })
@@ -309,7 +230,7 @@ export default {
   },
   methods: {
     // 获取全部商品接口
-    getGoodsFun({ id }) {
+    getGoodsFun ({ id }) {
       let _this = this
       startLoading()
       getGoodsDetail('goods/getGoodsDetail', { id }).then(res => {
@@ -330,31 +251,36 @@ export default {
           } else {
             res.data.data.isVideos = true
           }
+          if (res.data.data.isFixed === 0) {
+            res.data.data.isFixed = false
+          } else {
+            res.data.data.isFixed = true
+          }
           _this.createFrom = changeQuerystringDetail(res.data.data)
         }
       }).catch(() => { })
     },
     // 接受从子组件传过来的cover值
-    coverList(req) {
+    coverList (req) {
       this.createFrom.coverList = req
       this.$refs.coverFrom.clearValidate()
     },
-    coverListDel(req) {
+    coverListDel (req) {
       this.createFrom.coverList = req
     },
-    swiperList(req) {
+    swiperList (req) {
       this.createFrom.swiperList = req
       this.$refs.swiperFrom.clearValidate()
     },
-    videoList(req) {
+    videoList (req) {
       this.createFrom.videoList = req
     },
     // 转换商品类型
-    changeGoodsType(val) {
+    changeGoodsType (val) {
       return this.Config.MEAT_TYPE.MEAT_TYPE_STATUS(val)
     },
     // 创建商品接口
-    newGoodsFun(data) {
+    newGoodsFun (data) {
       startLoading()
       newGoods('goods/newGoods', data).then(res => {
         closeLoading()
@@ -369,7 +295,7 @@ export default {
       }).catch(() => { })
     },
     // 编辑商品接口
-    upGoodsDataFun(data) {
+    upGoodsDataFun (data) {
       startLoading()
       upGoodsData('goods/upGoodsData', data).then(res => {
         closeLoading()
@@ -384,7 +310,7 @@ export default {
       }).catch(() => { })
     },
     // 提交表单
-    submit(createFrom) {
+    submit (createFrom) {
       this.$refs[createFrom].validate((valid) => {
         if (this.createFrom.coverList.length > 0) {
           this.$refs.coverFrom.clearValidate()
@@ -422,7 +348,7 @@ export default {
       })
     },
     // 创建商品
-    createGoods() {
+    createGoods () {
       // 进行转换，因为涉及到换值
       this.createFromChange = Object.assign({}, this.createFrom)
       if (this.createFromChange.isHot === false) {
@@ -439,6 +365,11 @@ export default {
         this.createFromChange.isVideos = 0
       } else {
         this.createFromChange.isVideos = 1
+      }
+      if (this.createFromChange.isFixed === false) {
+        this.createFromChange.isFixed = 0
+      } else {
+        this.createFromChange.isFixed = 1
       }
       this.createFromChange.coverList = querystring.stringify(this.createFromChange.coverList[0])
       let swiperList = []
@@ -461,7 +392,7 @@ export default {
     },
 
     // esc关闭dialog
-    handleClose(done) {
+    handleClose (done) {
       this.$confirm('确认关闭？')
         .then(_ => {
           // done()

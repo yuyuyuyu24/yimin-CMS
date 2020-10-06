@@ -39,13 +39,13 @@ axios.interceptors.response.use((response) => {
   } else {
     return Promise.resolve(response)
   }
-}, function(error) {
+}, function (error) {
   return Promise.reject(error)
 })
 
 export default axios
 
-export function get(url, params) {
+export function get (url, params) {
   return new Promise((resolve, reject) => {
     axios.get(url, {
       params: params
@@ -58,7 +58,7 @@ export function get(url, params) {
   })
 }
 
-export function post(url, params, config = {}) {
+export function post (url, params, config = {}) {
   return new Promise((resolve, reject) => {
     axios.post(url, params, config)
       .then(res => {

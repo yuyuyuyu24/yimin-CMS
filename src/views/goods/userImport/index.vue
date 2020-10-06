@@ -2,10 +2,8 @@
   <div class="user-import-content">
     <h1>批量导入</h1>
     <p>
-      为了保证数据成功导入，请严格按照发单模板的内容填写。如果你还没有发单模板，<el-link
-        type="primary"
-        href=""
-      >请点击这里下载发单模板</el-link>
+      为了保证数据成功导入，请严格按照发单模板的内容填写。如果你还没有发单模板，
+      <el-link type="primary" href>请点击这里下载发单模板</el-link>
     </p>
     <div class="user-import-upload">
       <el-upload
@@ -15,13 +13,11 @@
         multiple
       >
         <i class="el-icon-upload" />
-        <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-        <div
-          slot="tip"
-          class="el-upload__tip"
-        >
-          只能上传jpg/png文件，且不超过500kb
+        <div class="el-upload__text">
+          将文件拖到此处，或
+          <em>点击上传</em>
         </div>
+        <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
       </el-upload>
     </div>
   </div>
@@ -29,7 +25,7 @@
 
 <script>
 export default {
-  data() {
+  data () {
     return {
     }
   },

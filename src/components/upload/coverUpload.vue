@@ -9,18 +9,12 @@
       :before-upload="beforeAvatarUpload"
       :http-request="upload"
       list-type="picture"
-      accept="image/jpeg,image/gif,image/png,image/bmp"
+      accept="image/jpeg, image/gif, image/png, image/bmp"
       :limit="1"
       :on-exceed="exceed"
     >
-      <el-button
-        size="small"
-        type="primary"
-      >点击上传</el-button>
-      <div
-        slot="tip"
-        class="el-upload__tip"
-      >只能上传jpg/png/jpeg文件</div>
+      <el-button size="small" type="primary">点击上传</el-button>
+      <div slot="tip" class="el-upload__tip">只能上传jpg/png/jpeg文件</div>
     </el-upload>
   </div>
 </template>
@@ -34,12 +28,12 @@ export default {
   props: {
     coverlist: {
       type: Array,
-      default() {
+      default () {
         return []
       }
     }
   },
-  data() {
+  data () {
     return {
       uploadData: { key: '', token: '' },
       formAdd: { brandLogo: '' },
@@ -50,17 +44,17 @@ export default {
   watch: {
     coverlist: {
       deep: true,
-      handler() {
+      handler () {
         this.fileList = this.coverlist
       }
     }
   },
-  mounted() {
+  mounted () {
     this.qiniutokenFun()
   },
   methods: {
     // 请求七牛云token
-    qiniutokenFun() {
+    qiniutokenFun () {
       if (getCookie('qiniutoken') === null) {
         qiniutoken('goods/token').then((res) => {
           if (res.status === 200) {
@@ -73,10 +67,10 @@ export default {
       }
     },
     // 获取上传进度
-    progress(res) {
+    progress (res) {
       this.upLoadProgress = res
     },
-    upload(req) {
+    upload (req) {
       const formdata = new FormData()
       this.uploadData.key = `upload_pic_${new Date().getTime()}_${req.file.name}`
       formdata.append('file', req.file)
@@ -93,19 +87,19 @@ export default {
         this.$emit('coverFile', this.fileList)
       })
     },
-    uploadError(err, file, fileList) {
+    uploadError (err, file, fileList) {
       this.$message({
         message: err,
         type: 'error',
         center: true
       })
     },
-    doDeleteImg(file, fileList) {
+    doDeleteImg (file, fileList) {
       this.fileList = fileList
       this.$emit('coverFileDel', this.fileList)
     },
     // 上传文件限制
-    beforeAvatarUpload(file) {
+    beforeAvatarUpload (file) {
       if (!funcChina(file.name)) {
         message('warning', '图片名称不能含有中文！请修改后重新上传。')
         return false
@@ -119,7 +113,7 @@ export default {
         return false
       }
     },
-    exceed() {
+    exceed () {
       message('warning', '商品封面只能为一张，如果需要更换封面把刚上传的封面删除即可。')
     }
 
